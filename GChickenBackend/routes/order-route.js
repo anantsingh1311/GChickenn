@@ -1,0 +1,105 @@
+const express = require("express");
+const router = express.Router();
+const nodemailer = require("nodemailer");
+const Order = require("../models/order-model");
+
+router.post("/add", async (req, res) => {
+  try {
+    const { username, email, address1, address2, city, postcode, items } = req.body;
+
+    if (!username || !email || !address1 || !city || !postcode || !items || items.length === 0) {
+      return res.status(400).json({ message: "Please fill all required fields" });
+    }
+
+    const cleanedItems = items.map((item) => ({
+      itemName: item.itemName,
+      price: Number(item.price),
+      weight: Number(item.weight)
+    }));
+
+    const newOrder = new Order({
+      username,
+      email,
+      address1,
+      address2,
+      city,
+      postcode,
+      items: cleanedItems
+    });
+
+    await newOrder.save();
+
+    const totalAmount = cleanedItems.reduce(
+      (sum, item) => sum + item.price * item.weight,
+      0
+    );
+
+    const itemLines = cleanedItems
+      .map(
+        (item) =>
+          `${item.itemName} - ${item.weight} kg × ₹${item.price} = ₹${(
+            item.weight * item.price
+          ).toFixed(2)}`
+      )
+      .join("\n");
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+      }
+    });
+
+    await transporter.sendMail({
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Your GChickenn Order Confirmation",
+      text: `Hello ${username},
+
+Thank you for your order with GChickenn.
+
+Order Details:
+${itemLines}
+
+Total: ₹${totalAmount.toFixed(2)}
+
+Delivery Address:
+${address1}
+${address2 ? address2 + "\n" : ""}${city}
+${postcode}
+
+We will contact you shortly regarding your order.
+
+Regards,
+GChickenn`
+    });
+
+    res.status(201).json({
+      message: "Order placed successfully and confirmation email sent"
+    });
+  } catch (err) {
+    console.error("Order creation error:", err);
+    res.status(500).json({ message: "Server error while placing order" });
+  }
+});
+router.get("/", async (req, res) => {
+  try {
+    const orders = await Order.find().sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (err) {
+    console.error("Error fetching orders:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+router.delete("/:id", async (req, res) => {
+  try {
+    await Order.findByIdAndDelete(req.params.id);
+    res.json({ message: "Order deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting order:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+module.exports = router;
