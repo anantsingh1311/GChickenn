@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 import Navbar from "./components/Navbar";
 import Home from "./components/Home";
@@ -68,6 +69,7 @@ function App() {
 <Route path="/reset-password/:token" element={<ResetPasswordWrapper />} />
           </Routes>
         </main>
+        <SpeedInsights />
       </div>
     </Router>
   );
