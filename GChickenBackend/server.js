@@ -20,7 +20,7 @@ app.use(cookieParser());
 
 app.use(
   cors({
-    origin: ["http://localhost:3000","https://g-chickenn.vercel.app/"],
+    origin: ["http://localhost:3000","https://g-chickenn.vercel.app"],
     credentials: true
   })
 );
