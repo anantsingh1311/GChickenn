@@ -7,7 +7,7 @@ export default class Home extends Component {
       <div className="home-page">
         <section className="home-hero">
           <div className="home-hero-overlay">
-            <h1 className="home-title">From Our Farm. Not the Mandi.</h1>
+            <h1 className="home-title">DELIVERING FARM-FRESH CHICKEN</h1>
             <p className="home-subtitle">
               Premium farm-raised chicken with full control over quality,
               hygiene, and freshness — from our farm to your doorstep.
