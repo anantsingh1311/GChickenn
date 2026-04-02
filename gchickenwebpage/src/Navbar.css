@@ -90,18 +90,6 @@
   color: #ffd700 !important;
 }
 
-/* CTA button */
-.nav-cta {
-  border: 1.5px solid #d4af37;
-  padding: 6px 14px;
-  border-radius: 999px;
-}
-
-.nav-cta:hover {
-  background: #d4af37;
-  color: #0d5c43 !important;
-}
-
 /* =========================
    MOBILE
 ========================= */

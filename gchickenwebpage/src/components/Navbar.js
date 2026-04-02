@@ -103,7 +103,7 @@ export default class Navbar extends Component {
                 </li>
 
                 <li className="nav-item">
-                  <Link to="/Order" className="nav-link royal-link nav-cta">
+                  <Link to="/Order" className="nav-link royal-link">
                     Order Now
                   </Link>
                 </li>

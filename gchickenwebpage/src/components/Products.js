@@ -151,8 +151,7 @@ export default class Products extends Component {
           <div className="section-heading-wrap">
             <h2 className="section-heading">Retail Price Sheet</h2>
             <p className="section-description">
-              Explore our fresh product selection. Click on any product image to
-              view it in full size.
+              Explore our fresh product selection.
             </p>
           </div>
 
