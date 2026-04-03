@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 const nodemailer = require("nodemailer");
 const Order = require("../models/order-model");
-const { Resend } = require("resend");
-const resend = new Resend(process.env.RESEND_API_KEY);
+// const { Resend } = require("resend");
+// const resend = new Resend(process.env.RESEND_API_KEY);
 
 router.post("/add", async (req, res) => {
   try {
