@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const nodemailer = require("nodemailer");
 const Order = require("../models/order-model");
+const { Resend } = require("resend");
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 router.post("/add", async (req, res) => {
   try {
@@ -43,13 +45,15 @@ router.post("/add", async (req, res) => {
       )
       .join("\n");
 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-      }
-    });
+   const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false, // VERY IMPORTANT (must be false for 587)
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
@@ -74,6 +78,15 @@ We will contact you shortly regarding your order.
 Regards,
 GChickenn`
     });
+
+// const data = await resend.emails.send({
+//   from: process.env.EMAIL_USER,
+//   to: email,
+//   subject: "Hello World",
+//   html: "<p>Congrats on sending your <strong>first email</strong>!</p>"
+// });
+
+//  console.log("RESEND RESPONSE:", data);
 
     res.status(201).json({
       message: "Order placed successfully and confirmation email sent"
