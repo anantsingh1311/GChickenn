@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import "../Order.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default class Order extends Component {
   constructor(props) {
@@ -63,6 +65,41 @@ export default class Order extends Component {
       }
     }));
   };
+  handleIncrement = (item, step = 0.5) => {
+  this.setState((prevState) => {
+    const currentWeight = parseFloat(prevState.cart[item._id]?.weight) || 0;
+    const newWeight = (currentWeight + step).toFixed(1);
+
+    return {
+      cart: {
+        ...prevState.cart,
+        [item._id]: {
+          ...item,
+          weight: newWeight
+        }
+      }
+    };
+  });
+};
+
+handleDecrement = (item, step = 0.5) => {
+  this.setState((prevState) => {
+    const currentWeight = parseFloat(prevState.cart[item._id]?.weight) || 0;
+    let newWeight = currentWeight - step;
+
+    if (newWeight < 0) newWeight = 0;
+
+    return {
+      cart: {
+        ...prevState.cart,
+        [item._id]: {
+          ...item,
+          weight: newWeight.toFixed(1)
+        }
+      }
+    };
+  });
+};
 
   handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -117,7 +154,7 @@ export default class Order extends Component {
       withCredentials: true
     });
 
-    alert(res.data.message);
+    toast.success(res.data.message);
 
     this.setState({
       cart: {},
@@ -133,7 +170,7 @@ export default class Order extends Component {
     });
   } catch (err) {
     console.error(err);
-    alert(err.response?.data?.message || "Failed to place order");
+    toast.error(err.response?.data?.message || "Failed to place order");
   }
 };
 
@@ -144,6 +181,7 @@ export default class Order extends Component {
 
     return (
       <div className="order-page">
+        <ToastContainer position="top-center" autoClose={2000} />
         <section className="order-hero">
           <h1 className="order-title">Order Fresh Products</h1>
           <p className="order-subtitle">
@@ -205,7 +243,35 @@ export default class Order extends Component {
                   <p className="order-product-description">{item.description}</p>
                   <p className="order-product-price">₹ {item.price} / kg</p>
 
-                  <input
+                  <div className="weight-stepper">
+                            <button
+                              type="button"
+                              className="stepper-btn"
+                              onClick={() => this.handleDecrement(item)}
+                            >
+                              −
+                            </button>
+
+                            <input
+                              type="number"
+                              className="order-weight-input"
+                              value={cart[item._id]?.weight || ""}
+                              onChange={(e) =>
+                                this.handleWeightChange(item, e.target.value)
+                              }
+                              min="0"
+                              step="0.1"
+                            />
+
+                            <button
+                              type="button"
+                              className="stepper-btn"
+                              onClick={() => this.handleIncrement(item)}
+                            >
+                              +
+                            </button>
+                          </div>
+                  {/* <input
                     type="number"
                     className="order-weight-input"
                     placeholder="Enter weight (kg)"
@@ -215,7 +281,7 @@ export default class Order extends Component {
                     }
                     min="0"
                     step="0.1"
-                  />
+                  /> */}
                 </div>
               </div>
             ))}

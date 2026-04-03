@@ -363,3 +363,33 @@
     font-size: 1rem;
   }
 }
+
+.weight-stepper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.stepper-btn {
+  background: #f2c94c;/* purple */
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  font-size: 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.stepper-btn:hover {
+  background: rgba(13, 92, 67, 0.85);
+}
+
+.order-weight-input {
+  width: 80px;
+  text-align: center;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  padding: 6px;
+}
