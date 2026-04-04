@@ -40,12 +40,28 @@ export default class ForgotPassword extends Component {
         email
       });
 
-      toast.success(res.data.message || "Reset link sent to your email");
+      if(!res.data.emailSent){
+        toast.warning("Email couldnt be sent")
+        toast.warning(<div> 
+          Here is your reset link, click it to reset your password: 
+          <a href={res.data.message}>Reset Link</a>
+          </div>);
+      this.setState({
+        email: "",
+        loading: false
+      });
+      }
+      else{
+         toast.success("Email Sent Sucessfully")
+      // toast.success(res.data.message)
 
       this.setState({
         email: "",
         loading: false
       });
+
+      }
+     
     } catch (error) {
       this.setState({ loading: false });
 

@@ -67,6 +67,8 @@ router.post("/forgot-password", async (req, res) => {
   try {
     const { email } = req.body;
 
+  
+
     if (!email || !email.trim()) {
       return res.status(400).json({ message: "Email is required" });
     }
@@ -88,47 +90,61 @@ router.post("/forgot-password", async (req, res) => {
       .digest("hex");
 
     user.resetPasswordToken = hashedToken;
-    user.resetPasswordExpire = Date.now() + 15 * 60 * 1000; // 15 mins
+    user.resetPasswordExpire = Date.now() + 24 * 60 * 60 * 1000; // 1 day
 
     await user.save({ validateBeforeSave: false });
-
+    
     // const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
     const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}?username=${encodeURIComponent(user.username)}`;
 
-      const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false, // VERY IMPORTANT (must be false for 587)
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
+    //   const transporter = nodemailer.createTransport({
+    //   host: "smtp.gmail.com",
+    //   port: 587,
+    //   secure: false, // VERY IMPORTANT (must be false for 587)
+    //   auth: {
+    //     user: process.env.EMAIL_USER,
+    //     pass: process.env.EMAIL_PASS,
+    //   },
+    // });
 
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: user.email,
-      subject: "Password Reset Request",
-      html: `
-        <div style="font-family: Arial, sans-serif; padding: 20px; color: #222;">
-          <h2>Password Reset</h2>
-          <p>You requested to reset your password.</p>
-          <p>Your username is: "${user.username}" </p>
-          <p>Click the button below to reset it. This link expires in 15 minutes.</p>
-          <a href="${resetUrl}" 
-             style="display:inline-block;padding:12px 20px;background:#d62828;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;">
-             Reset Password
-          </a>
-          <p style="margin-top:20px;">If you did not request this, you can safely ignore this email.</p>
-        </div>
-      `
-    };
+    // const mailOptions = {
+    //   from: process.env.EMAIL_USER,
+    //   to: user.email,
+    //   subject: "Password Reset Request",
+    //   html: `
+    //     <div style="font-family: Arial, sans-serif; padding: 20px; color: #222;">
+    //       <h2>Password Reset</h2>
+    //       <p>You requested to reset your password.</p>
+    //       <p>Your username is: "${user.username}" </p>
+    //       <p>Click the button below to reset it. This link expires in 24 hrs.</p>
+    //       <a href="${resetUrl}" 
+    //          style="display:inline-block;padding:12px 20px;background:#d62828;color:#fff;text-decoration:none;border-radius:8px;font-weight:bold;">
+    //          Reset Password
+    //       </a>
+    //       <p style="margin-top:20px;">If you did not request this, you can safely ignore this email.</p>
+    //     </div>
+    //   `
+    // };
+    // let emailSent = false;
+    // try{
 
-    await transporter.sendMail(mailOptions);
-
-    return res.status(200).json({
-      message: "If an account with that email exists, a reset link has been sent."
-    });
+    // await transporter.sendMail(mailOptions);}
+    // catch(err){
+    //   emailSent = false;
+    //   console.error(`Email not sent`);
+    // }
+    let emailSent = false;
+    if(!emailSent){
+           return res.status(201).json({
+        success: true,
+        emailSent: false,
+        message:
+          `Email could not be sent, please click the link above that appears after to reset your password ${resetUrl}`
+      });
+    }
+      res.status(201).json({
+      message:"Email Delivered please use that link to navigate to reset your password"
+    })
   } catch (error) {
     console.error("Forgot password error:", error);
     return res.status(500).json({ message: "Server error" });
