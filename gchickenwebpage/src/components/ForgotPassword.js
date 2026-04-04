@@ -44,7 +44,7 @@ export default class ForgotPassword extends Component {
         toast.warning("Email couldnt be sent")
         toast.warning(<div> 
           Here is your reset link, click it to reset your password: 
-          <a href={res.data.message}>Reset Link</a>
+          <a href={res.data.resetUrl}>Reset Link</a>
           </div>);
       this.setState({
         email: "",

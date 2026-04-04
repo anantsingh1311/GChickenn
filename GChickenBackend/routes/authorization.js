@@ -139,7 +139,9 @@ router.post("/forgot-password", async (req, res) => {
         success: true,
         emailSent: false,
         message:
-          `Email could not be sent, please click the link above that appears after to reset your password ${resetUrl}`
+          `Email could not be sent, please click the link above that appears after to reset your password`,
+        resetUrl
+
       });
     }
       res.status(201).json({
