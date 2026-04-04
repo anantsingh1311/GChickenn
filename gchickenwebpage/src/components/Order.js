@@ -155,6 +155,18 @@ handleDecrement = (item, step = 0.5) => {
     });
 
     if (!res.data.emailSent){
+       this.setState({
+      cart: {},
+      activeImageIndex: {},
+      form: {
+        username: "",
+        email: "",
+        address1: "",
+        address2: "",
+        city: "Gurgaon",
+        postcode: ""
+      }
+    });
         toast.warning(res.data.message);
     }
 
