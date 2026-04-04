@@ -154,6 +154,10 @@ handleDecrement = (item, step = 0.5) => {
       withCredentials: true
     });
 
+    if (!res.data.emailSent){
+        toast.warning(res.data.message);
+    }
+
     toast.success(res.data.message);
 
     this.setState({

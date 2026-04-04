@@ -45,6 +45,8 @@ router.post("/add", async (req, res) => {
       )
       .join("\n");
 
+      let emailSent = true;
+
    const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
@@ -54,6 +56,8 @@ router.post("/add", async (req, res) => {
     pass: process.env.EMAIL_PASS,
   },
 });
+
+  try{
 
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
@@ -78,6 +82,19 @@ We will contact you shortly regarding your order.
 Regards,
 GChickenn`
     });
+  }catch(err){
+    emailSent = false;
+    console.error("The email recipt could not be sent due to server error, but your order has been saved and our sales representative shall contact you soon!😁");
+  }
+
+  if(!emailSent){
+     return res.status(201).json({
+        success: true,
+        emailSent: false,
+        message:
+          "Order placed successfully, but confirmation email could not be sent. Our team will contact you soon."
+      });
+  }
 
 // const data = await resend.emails.send({
 //   from: process.env.EMAIL_USER,
