@@ -56,26 +56,37 @@ require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
 
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://g-chickenn.vercel.app",
-  "https://www.gchickenn.in"
-];
+const allowedOrigins = process.env.CLIENT_URLS.split(",").map(origin => origin.trim());
+
+
 
 app.use(cookieParser());
 app.use(express.json());
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      return callback(null, false);
-    },
-    credentials: true
-  })
-);
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`Origin ${origin} not allowed by CORS`));
+  },
+  credentials: true
+}));
+
+// app.use(
+//   cors({
+//     origin: function (origin, callback) {
+//       if (!origin || allowedOrigins.includes(origin)) {
+//         return callback(null, true);
+//       }
+//       return callback(null, false);
+//     },
+//     credentials: true
+//   })
+// );
 
 app.get("/", (req, res) => {
   res.send("Backend is running");
