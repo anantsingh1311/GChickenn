@@ -76,17 +76,13 @@ app.use(cors({
   credentials: true
 }));
 
-// app.use(
-//   cors({
-//     origin: function (origin, callback) {
-//       if (!origin || allowedOrigins.includes(origin)) {
-//         return callback(null, true);
-//       }
-//       return callback(null, false);
-//     },
-//     credentials: true
-//   })
-// );
+app.use((req, res, next) => {
+  console.log("Incoming Origin:", req.headers.origin);
+  console.log("Host:", req.headers.host);
+  console.log("Method:", req.method, "URL:", req.originalUrl);
+  next();
+});
+
 
 app.get("/", (req, res) => {
   res.send("Backend is running");

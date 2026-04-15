@@ -33,7 +33,7 @@ export default class Login extends Component {
       return;
     }
 
-    try {
+  try {
   this.setState({ loading: true });
 
  const res = await axios.post(
