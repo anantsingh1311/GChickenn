@@ -10,6 +10,31 @@ const adminOnly = require('../middleware/adminmiddleware');
 const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
+
+function getClientBaseUrl(req) {
+  const configuredClientUrl = process.env.CLIENT_URL?.trim();
+
+  if (configuredClientUrl) {
+    return configuredClientUrl.replace(/\/+$/, "");
+  }
+
+  const configuredClientUrls = (process.env.CLIENT_URLS || "")
+    .split(",")
+    .map((url) => url.trim())
+    .filter(Boolean);
+
+  const requestOrigin = req.headers.origin?.trim();
+
+  if (requestOrigin && configuredClientUrls.includes(requestOrigin)) {
+    return requestOrigin.replace(/\/+$/, "");
+  }
+
+  if (configuredClientUrls.length) {
+    return configuredClientUrls[0].replace(/\/+$/, "");
+  }
+
+  return "http://localhost:3000";
+}
 //Industry standard method  using JWT tokens:
 router.post("/login", async (req, res) => {
   try {
@@ -94,8 +119,8 @@ router.post("/forgot-password", async (req, res) => {
 
     await user.save({ validateBeforeSave: false });
     
-    // const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
-    const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}?username=${encodeURIComponent(user.username)}`;
+    const clientBaseUrl = getClientBaseUrl(req);
+    const resetUrl = `${clientBaseUrl}/reset-password/${resetToken}`;
 
     //   const transporter = nodemailer.createTransport({
     //   host: "smtp.gmail.com",

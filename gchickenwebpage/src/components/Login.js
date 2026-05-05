@@ -1,118 +1,131 @@
-import React, { Component } from "react";
-import "../Login.css";
-import "@fontsource/great-vibes";
-import "bootstrap/dist/css/bootstrap.min.css";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Link } from "react-router-dom";
-export default class Login extends Component {
-  constructor(props) {
-    super(props);
 
-    this.state = {
-      username: "",
-      password: "",
-      loading: false
-    };
+import AuthLayout from "./AuthLayout";
+import { API_URL } from "../config";
+
+const toastProps = {
+  position: "top-center",
+  autoClose: 2200,
+  toastStyle: {
+    background: "#0b4a37",
+    color: "#f6edd2",
+    border: "1px solid rgba(216, 180, 91, 0.28)"
   }
+};
 
-  handleChange = (e) => {
-    this.setState({
-      [e.target.name]: e.target.value
-    });
+export default function Login() {
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ username: "", password: "" });
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setForm((current) => ({ ...current, [name]: value }));
   };
 
-  OnSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
-    const { username, password } = this.state;
-
-    if (!username || !password) {
-      toast.error("Please fill all fields");
+    if (!form.username || !form.password) {
+      toast.error("Please fill in both fields.", toastProps);
       return;
     }
 
-  try {
-  this.setState({ loading: true });
+    try {
+      setLoading(true);
 
- const res = await axios.post(
-  `${process.env.REACT_APP_API_URL}/api/login`,
-  { username, password },
-  { withCredentials: true }
-);
+      const response = await axios.post(
+        `${API_URL}/api/login`,
+        {
+          username: form.username,
+          password: form.password
+        },
+        { withCredentials: true }
+      );
 
- const { user } = res.data;
+      const { user } = response.data;
 
-localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("user", JSON.stringify(user));
+      toast.success(`Welcome back, ${user.username}.`, toastProps);
 
-toast.success(`Welcome ${user.username}`);
-
-setTimeout(() => {
-  if (user.role?.toLowerCase() === "admin") {
-    window.location.href = "/admin";
-  } else {
-    window.location.href = "/";
-  }
-}, 1200);
-
-} catch (err) {
-  console.error(err);
-  toast.error("Invalid username or password");
-} finally {
-  this.setState({ loading: false });
-}
+      setTimeout(() => {
+        navigate(user.role?.toLowerCase() === "admin" ? "/admin" : "/");
+      }, 900);
+    } catch (error) {
+      console.error(error);
+      toast.error("Invalid username or password.", toastProps);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  render() {
-    const { username, password, loading } = this.state;
-
-    return (
-      <div className="login-page">
-        <ToastContainer position="top-center" autoClose={2000} />
-
-        <div className="login-card">
-          <h1 className="login-title">Log In</h1>
-
-          <form className="login-form" onSubmit={this.OnSubmit}>
-            <div className="login-field">
-              <label>Username</label>
-              <input
-                type="text"
-                name="username"
-                value={username}
-                onChange={this.handleChange}
-                required
-              />
-            </div>
-
-            <div className="login-field">
-              <label>Password</label>
-              <input
-                type="password"
-                name="password"
-                value={password}
-                onChange={this.handleChange}
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="login-button"
-              disabled={loading}
-            >
-              {loading ? "Logging in..." : "Log In"}
-            </button>
-            <p>Dont Have an Account ?  <Link to="/signup" className="navbar-brand royal-brand">
-                          Sign-up Now 😁
-                        </Link></p>
-            <Link to="/forgot-password" className="auth-link">
-              Reset Password
+  return (
+    <>
+      <ToastContainer {...toastProps} />
+      <AuthLayout
+        eyebrow="Account access"
+        title="Log in to your account"
+        subtitle="Access ordering, saved customer details, and your premium buying experience in a few seconds."
+        accentTitle="Fast repeat ordering"
+        accentCopy="Once you are signed in, you can move from browsing to checkout with a much smoother flow on any device."
+        footer={
+          <p>
+            Do not have an account yet?{" "}
+            <Link to="/signup" className="font-semibold text-brand-gold hover:text-white">
+              Create one now
             </Link>
-          </form>
-        </div>
-      </div>
-    );
-  }
+          </p>
+        }
+      >
+        <form className="space-y-5" onSubmit={handleSubmit}>
+          <div>
+            <label className="input-label" htmlFor="username">
+              Username
+            </label>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              value={form.username}
+              onChange={handleChange}
+              className="input-field"
+              placeholder="Enter your username"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="input-label" htmlFor="password">
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              value={form.password}
+              onChange={handleChange}
+              className="input-field"
+              placeholder="Enter your password"
+              required
+            />
+          </div>
+
+          <button type="submit" className="primary-button w-full" disabled={loading}>
+            {loading ? "Logging in..." : "Log in"}
+          </button>
+
+          <Link
+            to="/forgot-password"
+            className="inline-flex text-sm font-medium text-brand-sand transition hover:text-white"
+          >
+            Need to reset your password?
+          </Link>
+        </form>
+      </AuthLayout>
+    </>
+  );
 }

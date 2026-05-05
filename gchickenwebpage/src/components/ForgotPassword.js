@@ -1,110 +1,109 @@
-import React, { Component } from "react";
-import "../Login.css";
-import "@fontsource/great-vibes";
-import "bootstrap/dist/css/bootstrap.min.css";
-import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-export default class ForgotPassword extends Component {
-  constructor(props) {
-    super(props);
+import AuthLayout from "./AuthLayout";
+import { API_URL } from "../config";
 
-    this.state = {
-      email: "",
-      loading: false
-    };
+const toastProps = {
+  position: "top-center",
+  autoClose: 3200,
+  toastStyle: {
+    background: "#0b4a37",
+    color: "#f6edd2",
+    border: "1px solid rgba(216, 180, 91, 0.28)"
   }
+};
 
-  handleChange = (e) => {
-    this.setState({
-      [e.target.name]: e.target.value
-    });
-  };
+export default function ForgotPassword() {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const { email } = this.state;
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
     if (!email.trim()) {
-      toast.error("Please enter your email address");
+      toast.error("Please enter your email address.", toastProps);
       return;
     }
 
     try {
-      this.setState({ loading: true });
+      setLoading(true);
 
-      const res = await axios.post(`${process.env.REACT_APP_API_URL}/api/forgot-password`, {
+      const response = await axios.post(`${API_URL}/api/forgot-password`, {
         email
       });
 
-      if(!res.data.emailSent){
-        toast.warning("Email couldnt be sent")
-        toast.warning(<div> 
-          Here is your reset link, click it to reset your password: 
-          <a href={res.data.resetUrl}>Reset Link</a>
-          </div>);
-      this.setState({
-        email: "",
-        loading: false
-      });
+      if (!response.data.emailSent) {
+        toast.warning("Email could not be sent automatically.", toastProps);
+        toast.warning(
+          <span>
+            Use this reset link instead:{" "}
+            <a
+              href={response.data.resetUrl}
+              className="font-semibold underline"
+              target="_blank"
+              rel="noreferrer"
+            >
+              open reset link
+            </a>
+          </span>,
+          { ...toastProps, autoClose: 6500 }
+        );
+      } else {
+        toast.success("Reset email sent successfully.", toastProps);
       }
-      else{
-         toast.success("Email Sent Sucessfully")
-      // toast.success(res.data.message)
 
-      this.setState({
-        email: "",
-        loading: false
-      });
-
-      }
-     
+      setEmail("");
     } catch (error) {
-      this.setState({ loading: false });
-
-      toast.error(error.response?.data?.message || "Something went wrong");
+      toast.error(error.response?.data?.message || "Something went wrong.", toastProps);
+    } finally {
+      setLoading(false);
     }
   };
 
-  render() {
-    const { email, loading } = this.state;
-
-    return (
-      <div className="auth-page">
-        <ToastContainer />
-        <div className="auth-card">
-          <h1 className="auth-title">Forgot Password</h1>
-          <p className="auth-subtitle">
-            Enter your email address and we’ll send you a password reset link.
+  return (
+    <>
+      <ToastContainer {...toastProps} />
+      <AuthLayout
+        eyebrow="Password recovery"
+        title="Reset your password"
+        subtitle="Enter the email linked to your account and we will send you a secure reset path."
+        accentTitle="Support when you need it"
+        accentCopy="If email delivery is delayed, the recovery flow still provides a direct link so you are not blocked."
+        footer={
+          <p>
+            Remembered it?{" "}
+            <Link to="/login" className="font-semibold text-brand-gold hover:text-white">
+              Back to login
+            </Link>
           </p>
-
-          <form onSubmit={this.handleSubmit} className="auth-form">
-            <label>Email Address</label>
+        }
+      >
+        <form className="space-y-5" onSubmit={handleSubmit}>
+          <div>
+            <label className="input-label" htmlFor="email">
+              Email address
+            </label>
             <input
-              type="email"
+              id="email"
               name="email"
+              type="email"
               value={email}
-              onChange={this.handleChange}
+              onChange={(event) => setEmail(event.target.value)}
+              className="input-field"
               placeholder="Enter your registered email"
               required
             />
+          </div>
 
-            <button type="submit" className="auth-btn" disabled={loading}>
-              {loading ? "Sending..." : "Send Reset Link"}
-            </button>
-          </form>
-
-          <p className="auth-footer-text">
-            Remembered your password?{" "}
-            <Link to="/login" className="auth-link">
-              Back to Login
-            </Link>
-          </p>
-        </div>
-      </div>
-    );
-  }
+          <button type="submit" className="primary-button w-full" disabled={loading}>
+            {loading ? "Sending link..." : "Send reset link"}
+          </button>
+        </form>
+      </AuthLayout>
+    </>
+  );
 }

@@ -1,9 +1,11 @@
 // The route we are creating:
 const router = require('express').Router();
 let User = require('../models/user-model');
+const auth = require("../middleware/authorizationmiddleware");
+const adminOnly = require("../middleware/adminmiddleware");
 
 //API call to get current data from the database:
-router.route('/').get(async (req, res) => {
+router.route('/').get(auth, adminOnly, async (req, res) => {
   try {
     const user = await User.find({});
     res.json(user);
@@ -80,7 +82,7 @@ router.post('/add', async (req, res) => {
 });
 
 //To allow admin to delete user info
-router.route('/:id').delete((req, res) => {
+router.route('/:id').delete(auth, adminOnly, (req, res) => {
     User.findByIdAndDelete(req.params.id)
     .then(() => res.json('Excercise data deleted!'))
     .catch(err=> res.status(400).json('Error: '+err))

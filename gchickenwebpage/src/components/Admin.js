@@ -1,135 +1,169 @@
-import React, { Component } from "react";
-import "../App.css";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "../Admin.css";
+import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 
-export default class Admin extends Component {
-  constructor(props) {
-    super(props);
+import { API_URL } from "../config";
+import { formatCurrency } from "../utils/formatters";
 
-    this.state = {
-      users: [],
-      orders: []
-    };
-  }
+export default function Admin() {
+  const [users, setUsers] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [loadingUsers, setLoadingUsers] = useState(true);
+  const [loadingOrders, setLoadingOrders] = useState(true);
 
-  componentDidMount() {
-    this.fetchUsers();
-    this.fetchOrders();
-  }
+  const currentUser = JSON.parse(localStorage.getItem("user"));
 
-  fetchUsers = () => {
-    axios
-      .get(`${process.env.REACT_APP_API_URL}/user`, { withCredentials: true })
-      .then((response) => {
-        this.setState({ users: response.data });
-      })
-      .catch((error) => {
-        console.error("Error fetching users:", error);
-      });
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/user`, { withCredentials: true });
+      setUsers(response.data || []);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    } finally {
+      setLoadingUsers(false);
+    }
   };
 
-  fetchOrders = () => {
-    axios
-      .get(`${process.env.REACT_APP_API_URL}/orders`, { withCredentials: true })
-      .then((response) => {
-        this.setState({ orders: response.data });
-      })
-      .catch((error) => {
-        console.error("Error fetching orders:", error);
-      });
+  const fetchOrders = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/orders`, { withCredentials: true });
+      setOrders(response.data || []);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    } finally {
+      setLoadingOrders(false);
+    }
   };
 
-  onButtonPressed = (id) => {
-    console.log("Attempting to delete user with ID:", id);
-    if (!window.confirm("Are you sure you want to delete this user?")) return;
+  useEffect(() => {
+    fetchUsers();
+    fetchOrders();
+  }, []);
 
-    axios
-      .delete(`${process.env.REACT_APP_API_URL}/user/${id}`, { withCredentials: true })
-      .then(() => {
-        this.setState({
-          users: this.state.users.filter((user) => user._id !== id)
-        });
-      })
-      .catch((error) => {
-        console.error("Error deleting user:", error);
-      });
+  const orderCount = orders.length;
+  const userCount = users.length;
+  const totalRevenue = useMemo(
+    () =>
+      orders.reduce((sum, order) => {
+        return (
+          sum +
+          (order.items || []).reduce((itemSum, item) => {
+            return itemSum + Number(item.price) * Number(item.weight);
+          }, 0)
+        );
+      }, 0),
+    [orders]
+  );
+
+  const deleteUser = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this user?")) {
+      return;
+    }
+
+    try {
+      await axios.delete(`${API_URL}/user/${id}`, { withCredentials: true });
+      setUsers((current) => current.filter((user) => user._id !== id));
+    } catch (error) {
+      console.error("Error deleting user:", error);
+    }
   };
 
-  onDeleteOrder = (id) => {
-    console.log("Attempting to delete order with ID:", id);
-    if (!window.confirm("Are you sure you want to delete this order?")) return;
+  const deleteOrder = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this order?")) {
+      return;
+    }
 
-    axios
-      .delete(`${process.env.REACT_APP_API_URL}/orders/${id}`, { withCredentials: true })
-      .then(() => {
-        this.setState({
-          orders: this.state.orders.filter((order) => order._id !== id)
-        });
-      })
-      .catch((error) => {
-        console.error("Error deleting order:", error);
-      });
+    try {
+      await axios.delete(`${API_URL}/orders/${id}`, { withCredentials: true });
+      setOrders((current) => current.filter((order) => order._id !== id));
+    } catch (error) {
+      console.error("Error deleting order:", error);
+    }
   };
 
-  renderOrderItems = (items) => {
-    if (!items || items.length === 0) return "No items";
+  const renderOrderItems = (items) => {
+    if (!items?.length) {
+      return <span className="text-brand-cream/55">No items</span>;
+    }
 
     return (
-      <div className="order-items-list">
+      <div className="space-y-2">
         {items.map((item, index) => (
-          <div key={index} className="order-item-row">
-            {item.itemName} - {item.weight} kg × ₹{item.price}
+          <div
+            key={`${item.itemName}-${index}`}
+            className="rounded-2xl border border-brand-line bg-white/5 px-3 py-2"
+          >
+            <span className="font-medium text-white">{item.itemName}</span>
+            <span className="text-brand-cream/70"> - {item.weight} kg x {formatCurrency(item.price)}</span>
           </div>
         ))}
       </div>
     );
   };
 
-  calculateOrderTotal = (items) => {
-    if (!items || items.length === 0) return "0.00";
-
-    const total = items.reduce((sum, item) => {
-      return sum + Number(item.price) * Number(item.weight);
-    }, 0);
-
-    return total.toFixed(2);
+  const calculateOrderTotal = (items) => {
+    return (items || []).reduce((sum, item) => sum + Number(item.price) * Number(item.weight), 0);
   };
 
-  render() {
-    const { users, orders } = this.state;
-    const currentUser = JSON.parse(localStorage.getItem("user"));
-
-    return (
-      <div className="admin-page">
-        <div className="table-wrapper">
-          <div className="content">
-            <h1>Admin Dashboard</h1>
+  return (
+    <div className="page-container space-y-6 pt-4 sm:space-y-8">
+      <section className="section-shell">
+        <span className="section-eyebrow">Admin dashboard</span>
+        <div className="mt-5 grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">
+          <div>
+            <h1 className="section-title">Manage customers and incoming orders with a cleaner control view.</h1>
+            <p className="section-copy mt-4">
+              This dashboard keeps the same premium visual system as the storefront while making large tables easier to scan on different screen sizes.
+            </p>
           </div>
 
-          <section className="admin-section">
-            <h2>
-              <u>Captured User Info:</u>
-            </h2>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="rounded-3xl border border-brand-line bg-white/5 p-5">
+              <p className="text-xs uppercase tracking-[0.22em] text-brand-sand">Users</p>
+              <p className="mt-3 font-display text-3xl text-white">{userCount}</p>
+            </div>
+            <div className="rounded-3xl border border-brand-line bg-white/5 p-5">
+              <p className="text-xs uppercase tracking-[0.22em] text-brand-sand">Orders</p>
+              <p className="mt-3 font-display text-3xl text-white">{orderCount}</p>
+            </div>
+            <div className="rounded-3xl border border-brand-line bg-white/5 p-5">
+              <p className="text-xs uppercase tracking-[0.22em] text-brand-sand">Revenue</p>
+              <p className="mt-3 font-display text-3xl text-white">{formatCurrency(totalRevenue)}</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
-            <div className="admin-table-scroll">
-              <table className="table admin-table">
+      <section className="section-shell">
+        <div className="flex flex-col gap-3 border-b border-brand-line pb-6 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <span className="section-eyebrow">Customer accounts</span>
+            <h2 className="mt-4 font-display text-3xl text-white">Registered users</h2>
+          </div>
+          <p className="max-w-xl text-sm leading-7 text-brand-cream/70">
+            Account data is shown in a horizontally scrollable table to remain readable on narrower viewports.
+          </p>
+        </div>
+
+        <div className="mt-8 overflow-x-auto">
+          {loadingUsers ? (
+            <div className="status-card">Loading users...</div>
+          ) : (
+            <div className="data-table min-w-[900px]">
+              <table>
                 <thead>
                   <tr>
                     <th>Username</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Firm Name</th>
-                    <th>Email Id</th>
+                    <th>First name</th>
+                    <th>Last name</th>
+                    <th>Firm name</th>
+                    <th>Email</th>
                     <th>Mobile</th>
                     <th>Role</th>
                     <th>Action</th>
                   </tr>
                 </thead>
-
                 <tbody>
-                  {users.length > 0 ? (
+                  {users.length ? (
                     users.map((user) => (
                       <tr key={user._id || user.username}>
                         <td>{user.username}</td>
@@ -141,39 +175,50 @@ export default class Admin extends Component {
                         <td>{user.role}</td>
                         <td>
                           {currentUser?.id === user._id ? (
-                                <button className="DeleteButton disabled-btn" disabled>
-                                    You
-                                </button>
-                                ) : (
-                                <button
-                                    className="DeleteButton"
-                                    onClick={() => this.onButtonPressed(user._id)}
-                                >
-                                    Delete
-                                </button>
-                                )}
+                            <span className="inline-flex rounded-full border border-dashed border-brand-line px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-brand-cream/55">
+                              You
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              className="secondary-button px-4 py-2"
+                              onClick={() => deleteUser(user._id)}
+                            >
+                              Delete
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="8" className="empty-cell">
-                        No users found.
-                      </td>
+                      <td colSpan="8">No users found.</td>
                     </tr>
                   )}
                 </tbody>
               </table>
             </div>
-          </section>
+          )}
+        </div>
+      </section>
 
-          <section className="admin-section">
-            <h2>
-              <u>Captured Orders:</u>
-            </h2>
+      <section className="section-shell">
+        <div className="flex flex-col gap-3 border-b border-brand-line pb-6 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <span className="section-eyebrow">Order management</span>
+            <h2 className="mt-4 font-display text-3xl text-white">Captured orders</h2>
+          </div>
+          <p className="max-w-xl text-sm leading-7 text-brand-cream/70">
+            Keep delivery details, product breakdowns, and totals together in a layout that stays legible on desktop and tablet.
+          </p>
+        </div>
 
-            <div className="admin-table-scroll">
-              <table className="table admin-table">
+        <div className="mt-8 overflow-x-auto">
+          {loadingOrders ? (
+            <div className="status-card">Loading orders...</div>
+          ) : (
+            <div className="data-table min-w-[1180px]">
+              <table>
                 <thead>
                   <tr>
                     <th>Customer</th>
@@ -183,13 +228,12 @@ export default class Admin extends Component {
                     <th>Postcode</th>
                     <th>Items</th>
                     <th>Total</th>
-                    <th>Created At</th>
+                    <th>Created at</th>
                     <th>Action</th>
                   </tr>
                 </thead>
-
                 <tbody>
-                  {orders.length > 0 ? (
+                  {orders.length ? (
                     orders.map((order) => (
                       <tr key={order._id}>
                         <td>{order.username}</td>
@@ -200,17 +244,16 @@ export default class Admin extends Component {
                         </td>
                         <td>{order.city}</td>
                         <td>{order.postcode}</td>
-                        <td>{this.renderOrderItems(order.items)}</td>
-                        <td>₹ {this.calculateOrderTotal(order.items)}</td>
+                        <td>{renderOrderItems(order.items)}</td>
+                        <td>{formatCurrency(calculateOrderTotal(order.items))}</td>
                         <td>
-                          {order.createdAt
-                            ? new Date(order.createdAt).toLocaleString()
-                            : "N/A"}
+                          {order.createdAt ? new Date(order.createdAt).toLocaleString() : "N/A"}
                         </td>
                         <td>
                           <button
-                            className="DeleteButton"
-                            onClick={() => this.onDeleteOrder(order._id)}
+                            type="button"
+                            className="secondary-button px-4 py-2"
+                            onClick={() => deleteOrder(order._id)}
                           >
                             Delete
                           </button>
@@ -219,17 +262,15 @@ export default class Admin extends Component {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="9" className="empty-cell">
-                        No orders found.
-                      </td>
+                      <td colSpan="9">No orders found.</td>
                     </tr>
                   )}
                 </tbody>
               </table>
             </div>
-          </section>
+          )}
         </div>
-      </div>
-    );
-  }
+      </section>
+    </div>
+  );
 }

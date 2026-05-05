@@ -1,16 +1,15 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "./App.css";
+import { BrowserRouter as Router, Navigate, Route, Routes } from "react-router-dom";
 
-import Navbar from "./components/Navbar";
-import Home from "./components/Home";
-import Products from "./components/Products";
-import Login from "./components/Login";
-import Signup from "./components/Signup";
-import Order from "./components/Order";
 import Admin from "./components/Admin";
+import Footer from "./components/Footer";
 import ForgotPassword from "./components/ForgotPassword";
+import Home from "./components/Home";
+import Login from "./components/Login";
+import Navbar from "./components/Navbar";
+import Order from "./components/Order";
+import Products from "./components/Products";
 import ResetPasswordWrapper from "./components/ResetPasswordWrapper";
+import Signup from "./components/Signup";
 
 function ProtectedRoute({ children }) {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -35,43 +34,42 @@ function AdminRoute({ children }) {
 
   return children;
 }
-function App() {
+
+export default function App() {
   return (
     <Router>
-      <div className="app-root">
+      <div className="min-h-screen bg-brand-gradient text-brand-cream">
         <Navbar />
 
-        <main className="app-content">
+        <main className="pb-14">
           <Routes>
-         <Route path="/" element={<Home />} />
-                    <Route path="/products" element={<Products />} />
-                    <Route path="/login" element={<Login />} />
-                    <Route path="/signup" element={<Signup />} />
-                    
-                      <Route
-                        path="/order"
-                        element={
-                          <ProtectedRoute>
-                            <Order />
-                          </ProtectedRoute>
-                        }
-                      />
-                    <Route
-                      path="/admin"
-                      element={
-                        <AdminRoute>
-                          <Admin />
-                        </AdminRoute>
-                      }
-                    />
-                    <Route path="/forgot-password" element={<ForgotPassword />} />
-<Route path="/reset-password/:token" element={<ResetPasswordWrapper />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/products" element={<Products />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route
+              path="/order"
+              element={
+                <ProtectedRoute>
+                  <Order />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <AdminRoute>
+                  <Admin />
+                </AdminRoute>
+              }
+            />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPasswordWrapper />} />
           </Routes>
         </main>
+
+        <Footer />
       </div>
     </Router>
   );
 }
-
-export default App;
-

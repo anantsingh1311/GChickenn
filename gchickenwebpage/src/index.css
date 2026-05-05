@@ -1,13 +1,122 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background-color: #083627;
+    background-image:
+      radial-gradient(circle at top, rgba(216, 180, 91, 0.18), transparent 32%),
+      linear-gradient(180deg, #0f4f3a 0%, #062f24 100%);
+    color: #f6edd2;
+    font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
+  ::selection {
+    background: rgba(216, 180, 91, 0.3);
+    color: #fff8e4;
+  }
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@layer components {
+  .page-container {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .surface-panel {
+    @apply rounded-3xl border border-brand-line bg-white/5 shadow-panel backdrop-blur-sm;
+  }
+
+  .section-shell {
+    @apply surface-panel p-6 sm:p-8 lg:p-10;
+  }
+
+  .section-eyebrow {
+    @apply inline-flex items-center gap-2 rounded-full border border-brand-line bg-brand-gold/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-brand-sand;
+  }
+
+  .section-title {
+    @apply font-display text-3xl leading-tight text-white sm:text-4xl lg:text-[2.75rem];
+  }
+
+  .section-copy {
+    @apply max-w-3xl text-sm leading-7 text-brand-cream/80 sm:text-base;
+  }
+
+  .primary-button {
+    @apply inline-flex items-center justify-center rounded-full bg-brand-gold px-5 py-3 text-sm font-semibold text-brand-deep shadow-lg shadow-brand-deep/20 transition duration-300 hover:-translate-y-0.5 hover:bg-[#e6c978] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold focus-visible:ring-offset-2 focus-visible:ring-offset-brand-deep;
+  }
+
+  .secondary-button {
+    @apply inline-flex items-center justify-center rounded-full border border-brand-line bg-white/5 px-5 py-3 text-sm font-semibold text-brand-cream transition duration-300 hover:border-brand-gold/50 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-gold focus-visible:ring-offset-2 focus-visible:ring-offset-brand-deep;
+  }
+
+  .input-label {
+    @apply mb-2 block text-sm font-medium text-brand-cream;
+  }
+
+  .input-hint {
+    @apply mb-2 text-xs leading-5 text-brand-cream/60;
+  }
+
+  .input-field {
+    @apply w-full rounded-2xl border border-brand-line bg-white/95 px-4 py-3 text-sm text-slate-900 outline-none transition duration-200 placeholder:text-slate-400 focus:border-brand-gold focus:ring-2 focus:ring-brand-gold/30;
+  }
+
+  .status-card {
+    @apply rounded-2xl border border-brand-line bg-white/5 px-4 py-4 text-sm text-brand-cream/80;
+  }
+
+  .data-table {
+    @apply min-w-full overflow-hidden rounded-3xl border border-brand-line;
+  }
+
+  .data-table table {
+    @apply min-w-full border-collapse;
+  }
+
+  .data-table thead {
+    @apply bg-brand-gold/10 text-left text-xs uppercase tracking-[0.22em] text-brand-sand;
+  }
+
+  .data-table th {
+    @apply px-4 py-4 font-semibold;
+  }
+
+  .data-table td {
+    @apply border-t border-brand-line px-4 py-4 align-top text-sm leading-6 text-brand-cream/85;
+  }
 }

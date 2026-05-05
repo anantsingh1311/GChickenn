@@ -1,8 +1,12 @@
-import { render, screen } from '@testing-library/react';
-import App from './App';
+import { render, screen } from "@testing-library/react";
 
-test('renders learn react link', () => {
+import App from "./App";
+
+test("renders the GChickenn home hero", () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  expect(
+    screen.getByRole("heading", {
+      name: /delivering farm-fresh chicken with a calmer, cleaner buying experience/i
+    })
+  ).toBeInTheDocument();
 });

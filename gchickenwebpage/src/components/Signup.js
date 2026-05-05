@@ -1,241 +1,259 @@
-import React, { Component } from "react";
-import "../SignUp.css";
-import "@fontsource/great-vibes";
-import "bootstrap/dist/css/bootstrap.min.css";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-export default class Signup extends Component {
-  constructor(props) {
-    super(props);
+import AuthLayout from "./AuthLayout";
+import { API_URL } from "../config";
 
-    this.state = {
-      username: "",
-      firstname: "",
-      lastname: "",
-      firmname: "",
-      mobile: "",
-      email: "",
-      password: "",
-      passwordCheck: "",
-      loading: false
-    };
+const toastProps = {
+  position: "top-center",
+  autoClose: 2400,
+  toastStyle: {
+    background: "#0b4a37",
+    color: "#f6edd2",
+    border: "1px solid rgba(216, 180, 91, 0.28)"
   }
+};
 
-  // ------------------------
-  // INPUT HANDLER
-  // ------------------------
-  handleChange = (e) => {
-    this.setState({
-      [e.target.name]: e.target.value
-    });
+const initialForm = {
+  username: "",
+  firstname: "",
+  lastname: "",
+  firmname: "",
+  mobile: "",
+  email: "",
+  password: "",
+  passwordCheck: ""
+};
+
+function validateUsername(username) {
+  return /^[A-Za-z0-9]+$/.test(username);
+}
+
+function validatePassword(password) {
+  return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/.test(password);
+}
+
+export default function Signup() {
+  const navigate = useNavigate();
+  const [form, setForm] = useState(initialForm);
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setForm((current) => ({ ...current, [name]: value }));
   };
 
-  // ------------------------
-  // VALIDATION
-  // ------------------------
-  validateUsername = (username) => {
-    // must contain letters, numbers, special char
-    const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&]).+$/;
-    return regex.test(username);
-  };
+  const handleSubmit = async (event) => {
+    event.preventDefault();
 
-  validatePassword = (password) => {
-    // min 8, uppercase, lowercase, number, special char
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/;
-    return regex.test(password);
-  };
+    if (!validateUsername(form.username)) {
+      toast.error("Username can contain only letters and numbers.", toastProps);
+      return;
+    }
 
-  // ------------------------
-  // SUBMIT
-  // ------------------------
-  OnSubmit = async (e) => {
-    e.preventDefault();
-
-    const {
-      username,
-      firstname,
-      lastname,
-      firmname,
-      mobile,
-      email,
-      password,
-      passwordCheck
-    } = this.state;
-
-    // Username validation
-    if (!this.validateUsername(username)) {
+    if (!validatePassword(form.password)) {
       toast.error(
-        "Username must include letters, numbers, and a special character"
+        "Password must be at least 8 characters and include upper, lower, number, and special character.",
+        toastProps
       );
       return;
     }
 
-    // Password validation
-    if (!this.validatePassword(password)) {
-      toast.error(
-        "Password must be 8+ chars with uppercase, lowercase, number & special character"
-      );
-      return;
-    }
-
-    // Match check
-    if (password !== passwordCheck) {
-      toast.error("Passwords do not match");
+    if (form.password !== form.passwordCheck) {
+      toast.error("Passwords do not match.", toastProps);
       return;
     }
 
     try {
-      this.setState({ loading: true });
+      setLoading(true);
 
-      const user = {
-        username,
-        firstname,
-        lastname,
-        firmname,
-        mobile,
-        email,
-        password
-      };
+      await axios.post(`${API_URL}/user/add`, {
+        username: form.username,
+        firstname: form.firstname,
+        lastname: form.lastname,
+        firmname: form.firmname,
+        mobile: form.mobile,
+        email: form.email,
+        password: form.password
+      });
 
-      const res = await axios.post(
-        "http://localhost:5000/user/add",
-        user
-      );
-
-      console.log(res.data);
-
-      toast.success("Account created successfully! 🚀");
+      toast.success("Account created successfully.", toastProps);
+      setForm(initialForm);
 
       setTimeout(() => {
-        window.location.href = "/login";
-      }, 1200);
-
-    } catch (err) {
-      console.error(err);
-
-      if (err.response?.data?.message) {
-        toast.error(err.response.data.message); // e.g. "Username already exists"
-      } else {
-        toast.error("Signup failed. Try again.");
-      }
+        navigate("/login");
+      }, 900);
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.message || "Signup failed. Please try again.", toastProps);
     } finally {
-      this.setState({ loading: false });
+      setLoading(false);
     }
   };
 
-  // ------------------------
-  // RENDER
-  // ------------------------
-  render() {
-    const {
-      username,
-      firstname,
-      lastname,
-      firmname,
-      mobile,
-      email,
-      password,
-      passwordCheck,
-      loading
-    } = this.state;
-
-    return (
-      <div className="signup-page">
-        <ToastContainer position="top-center" autoClose={2000} />
-
-        <div className="signup-card">
-          <h1 className="signup-title">Create Account</h1>
-          <p className="signup-subtitle">
-            Sign up to start ordering fresh chicken 🐔
+  return (
+    <>
+      <ToastContainer {...toastProps} />
+      <AuthLayout
+        eyebrow="New customer"
+        title="Create your GChickenn account"
+        subtitle="Set up your customer profile once so future orders are quicker, cleaner, and easier to manage."
+        accentTitle="Made for returning buyers"
+        accentCopy="A saved account helps streamline future orders for homes, firms, and repeat family purchases."
+        footer={
+          <p>
+            Already registered?{" "}
+            <Link to="/login" className="font-semibold text-brand-gold hover:text-white">
+              Log in here
+            </Link>
           </p>
-
-          <form className="signup-form" onSubmit={this.OnSubmit}>
-
+        }
+      >
+        <form className="grid gap-4 sm:grid-cols-2" onSubmit={handleSubmit}>
+          <div className="sm:col-span-2">
+            <label className="input-label" htmlFor="username">
+              Username
+            </label>
+            <p className="input-hint">
+              Use only letters and numbers.
+            </p>
             <input
-              type="text"
+              id="username"
               name="username"
-              placeholder="Username"
-              value={username}
-              onChange={this.handleChange}
+              type="text"
+              value={form.username}
+              onChange={handleChange}
+              className="input-field"
+              placeholder="Choose a username"
               required
             />
+          </div>
 
+          <div>
+            <label className="input-label" htmlFor="firstname">
+              First name
+            </label>
             <input
-              type="text"
+              id="firstname"
               name="firstname"
-              placeholder="First Name"
-              value={firstname}
-              onChange={this.handleChange}
+              type="text"
+              value={form.firstname}
+              onChange={handleChange}
+              className="input-field"
+              placeholder="First name"
               required
             />
+          </div>
 
+          <div>
+            <label className="input-label" htmlFor="lastname">
+              Last name
+            </label>
             <input
-              type="text"
+              id="lastname"
               name="lastname"
-              placeholder="Last Name"
-              value={lastname}
-              onChange={this.handleChange}
-              required
-            />
-
-            <input
               type="text"
+              value={form.lastname}
+              onChange={handleChange}
+              className="input-field"
+              placeholder="Last name"
+              required
+            />
+          </div>
+
+          <div className="sm:col-span-2">
+            <label className="input-label" htmlFor="firmname">
+              Firm name
+            </label>
+            <input
+              id="firmname"
               name="firmname"
-              placeholder="Firm Name"
-              value={firmname}
-              onChange={this.handleChange}
+              type="text"
+              value={form.firmname}
+              onChange={handleChange}
+              className="input-field"
+              placeholder="Business or household name"
               required
             />
+          </div>
 
+          <div>
+            <label className="input-label" htmlFor="mobile">
+              Mobile number
+            </label>
             <input
-              type="tel"
+              id="mobile"
               name="mobile"
-              placeholder="Mobile Number"
-              value={mobile}
-              onChange={this.handleChange}
+              type="tel"
+              value={form.mobile}
+              onChange={handleChange}
+              className="input-field"
+              placeholder="Mobile number"
               required
             />
+          </div>
 
+          <div>
+            <label className="input-label" htmlFor="email">
+              Email address
+            </label>
             <input
-              type="email"
+              id="email"
               name="email"
-              placeholder="Email Address"
-              value={email}
-              onChange={this.handleChange}
+              type="email"
+              value={form.email}
+              onChange={handleChange}
+              className="input-field"
+              placeholder="Email address"
               required
             />
+          </div>
 
+          <div>
+            <label className="input-label" htmlFor="password">
+              Password
+            </label>
+            <p className="input-hint">
+              8+ characters with upper, lower, number, and special character.
+            </p>
             <input
-              type="password"
+              id="password"
               name="password"
-              placeholder="Password"
-              value={password}
-              onChange={this.handleChange}
-              required
-            />
-
-            <input
               type="password"
-              name="passwordCheck"
-              placeholder="Confirm Password"
-              value={passwordCheck}
-              onChange={this.handleChange}
+              value={form.password}
+              onChange={handleChange}
+              className="input-field"
+              placeholder="Create password"
               required
             />
+          </div>
 
-            <button
-              type="submit"
-              className="signup-button"
-              disabled={loading}
-            >
-              {loading ? "Creating Account..." : "Sign Up"}
+          <div>
+            <label className="input-label" htmlFor="passwordCheck">
+              Confirm password
+            </label>
+            <input
+              id="passwordCheck"
+              name="passwordCheck"
+              type="password"
+              value={form.passwordCheck}
+              onChange={handleChange}
+              className="input-field"
+              placeholder="Confirm password"
+              required
+            />
+          </div>
+
+          <div className="sm:col-span-2">
+            <button type="submit" className="primary-button w-full" disabled={loading}>
+              {loading ? "Creating account..." : "Create account"}
             </button>
-
-          </form>
-        </div>
-      </div>
-    );
-  }
+          </div>
+        </form>
+      </AuthLayout>
+    </>
+  );
 }

@@ -1,119 +1,157 @@
-import React, { Component } from "react";
-import { Link } from "react-router-dom";
-import "../Navbar.css";
-import "@fontsource/great-vibes";
-import "bootstrap/dist/css/bootstrap.min.css";
-import brandLogo from "../brand-logo.JPG";
+import React, { useEffect, useState } from "react";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import axios from "axios";
 
-export default class Navbar extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      user: JSON.parse(localStorage.getItem("user"))
-    };
-  }
+import brandLogo from "../brand-logo.JPG";
+import { API_URL } from "../config";
 
-  componentDidMount() {
-    window.addEventListener("storage", this.syncUser);
-  }
+const navItems = [
+  { label: "Home", to: "/" },
+  { label: "Products", to: "/products" },
+  { label: "Order Now", to: "/order" }
+];
 
-  componentWillUnmount() {
-    window.removeEventListener("storage", this.syncUser);
-  }
+function getStoredUser() {
+  return JSON.parse(localStorage.getItem("user"));
+}
 
-  syncUser = () => {
-    this.setState({ user: JSON.parse(localStorage.getItem("user")) });
+function linkClassName({ isActive }) {
+  return [
+    "rounded-full px-4 py-2 text-sm font-medium transition duration-200",
+    isActive
+      ? "bg-brand-gold text-brand-deep"
+      : "text-brand-cream/80 hover:bg-white/10 hover:text-white"
+  ].join(" ");
+}
+
+export default function Navbar() {
+  const location = useLocation();
+  const [user, setUser] = useState(getStoredUser());
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    const syncUser = () => setUser(getStoredUser());
+
+    syncUser();
+    window.addEventListener("storage", syncUser);
+
+    return () => window.removeEventListener("storage", syncUser);
+  }, []);
+
+  useEffect(() => {
+    setUser(getStoredUser());
+    setMobileOpen(false);
+  }, [location.pathname]);
+
+  const handleLogout = async () => {
+    try {
+      await axios.post(`${API_URL}/api/logout`, {}, { withCredentials: true });
+    } catch (err) {
+      console.error(err);
+    }
+
+    localStorage.removeItem("user");
+    sessionStorage.clear();
+    window.location.href = "/login";
   };
 
-  handleLogout = async () => {
-  try {
-    await axios.post(
-      `${process.env.REACT_APP_API_URL}/api/logout`,
-      {},
-      { withCredentials: true }
-    );
-  } catch (err) {
-    console.error(err);
-  }
+  return (
+    <header className="sticky top-0 z-40 border-b border-brand-line bg-brand-deep/80 backdrop-blur-xl">
+      <div className="border-b border-brand-line/70 bg-brand-deep/70">
+        <div className="page-container flex flex-col gap-3 py-3 text-sm text-brand-cream/70 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2">
+            <span className="rounded-full bg-brand-gold/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-sand">
+              Farm-raised quality
+            </span>
+            <span className="hidden sm:inline">Fresh chicken with trusted doorstep delivery.</span>
+          </div>
 
-  localStorage.removeItem("user");
-  sessionStorage.clear();
-  window.location.href = "/login";
-};
+          <div className="flex flex-wrap items-center gap-3 sm:justify-end">
+            {user?.role?.toLowerCase() === "admin" ? (
+              <Link
+                to="/admin"
+                className="rounded-full px-3 py-1.5 text-brand-sand transition hover:bg-white/10 hover:text-white"
+              >
+                Admin
+              </Link>
+            ) : null}
 
-  render() {
-    const { user } = this.state;
-
-    return (
-      <>
-        {/* TOP AUTH BAR */}
-        <div className="top-auth-bar">
-          <div className="top-auth-content">
             {user ? (
-              <>
-                {user.role === "admin" && (
-                  <Link to="/Admin" className="auth-link">
-                    Admin
-                  </Link>
-                )}
-                <span onClick={this.handleLogout} className="auth-link clickable">
-                  Logout
-                </span>
-              </>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="rounded-full px-3 py-1.5 text-brand-sand transition hover:bg-white/10 hover:text-white"
+              >
+                Logout
+              </button>
             ) : (
               <>
-                <Link to="/Login" className="auth-link">Log In</Link>
-                <Link to="/Signup" className="auth-link">Sign Up</Link>
+                <Link
+                  to="/login"
+                  className="rounded-full px-3 py-1.5 text-brand-sand transition hover:bg-white/10 hover:text-white"
+                >
+                  Log in
+                </Link>
+                <Link
+                  to="/signup"
+                  className="rounded-full border border-brand-line bg-white/5 px-4 py-1.5 text-brand-cream transition hover:border-brand-gold/50 hover:bg-white/10"
+                >
+                  Create account
+                </Link>
               </>
             )}
           </div>
         </div>
+      </div>
 
-        {/* MAIN NAVBAR */}
-        <nav className="navbar navbar-expand-lg royal-navbar">
-          <div className="container-fluid">
+      <div className="page-container py-4">
+        <div className="surface-panel flex items-center justify-between px-4 py-4 sm:px-6">
+          <Link to="/" className="flex min-w-0 items-center gap-3">
+            <img
+              src={brandLogo}
+              alt="GChickenn logo"
+              className="h-12 w-12 rounded-full border border-brand-line object-cover shadow-lg shadow-brand-deep/30"
+            />
 
-            {/* Brand */}
-            <Link to="/" className="navbar-brand royal-brand">
-              GChickenn
-              <img src={brandLogo} alt="logo" className="navbar-logo" />
-            </Link>
-
-            {/* Mobile toggle */}
-            <button
-              className="navbar-toggler custom-toggler"
-              type="button"
-              data-bs-toggle="collapse"
-              data-bs-target="#mainNavbar"
-            >
-              ☰
-            </button>
-
-            {/* Links */}
-            <div className="collapse navbar-collapse" id="mainNavbar">
-              <ul className="navbar-nav ms-auto nav-links">
-
-                <li className="nav-item">
-                  <Link to="/" className="nav-link royal-link">Home</Link>
-                </li>
-
-                <li className="nav-item">
-                  <Link to="/Products" className="nav-link royal-link">Products</Link>
-                </li>
-
-                <li className="nav-item">
-                  <Link to="/Order" className="nav-link royal-link">
-                    Order Now
-                  </Link>
-                </li>
-
-              </ul>
+            <div className="min-w-0">
+              <p className="font-display text-3xl leading-none text-brand-gold sm:text-4xl">
+                GChickenn
+              </p>
+              <p className="mt-1 text-xs uppercase tracking-[0.28em] text-brand-cream/55">
+                Premium fresh poultry
+              </p>
             </div>
+          </Link>
 
-          </div>
-        </nav>
-      </>
-    );
-  }
+          <button
+            type="button"
+            onClick={() => setMobileOpen((current) => !current)}
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-brand-line bg-white/5 text-brand-cream transition hover:bg-white/10 lg:hidden"
+            aria-label="Toggle navigation"
+            aria-expanded={mobileOpen}
+          >
+            <span className="text-lg">{mobileOpen ? "X" : "="}</span>
+          </button>
+
+          <nav className="hidden items-center gap-2 lg:flex">
+            {navItems.map((item) => (
+              <NavLink key={item.to} to={item.to} end={item.to === "/"} className={linkClassName}>
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
+        </div>
+
+        {mobileOpen ? (
+          <nav className="surface-panel mt-3 flex flex-col gap-2 p-3 lg:hidden">
+            {navItems.map((item) => (
+              <NavLink key={item.to} to={item.to} end={item.to === "/"} className={linkClassName}>
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
+        ) : null}
+      </div>
+    </header>
+  );
 }
