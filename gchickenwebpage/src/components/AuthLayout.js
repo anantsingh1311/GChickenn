@@ -18,11 +18,11 @@ export default function AuthLayout({
           <div className="relative space-y-5">
             <span className="section-eyebrow">{eyebrow}</span>
             <h2 className="font-display text-4xl leading-tight text-white">
-              Fresh food ordering should feel calm, clear, and trustworthy.
+              Online shopping should feel calm, clear, and trustworthy.
             </h2>
             <p className="max-w-md text-base leading-7 text-brand-cream/75">
               Sign in, create your account, or recover access with the same
-              premium experience customers expect from GChickenn.
+              consistent experience customers expect from Ecommerce store.
             </p>
           </div>
 

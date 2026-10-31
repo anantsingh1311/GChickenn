@@ -35,7 +35,7 @@ function buildOrderText({
 
   return `Hello ${username},
 
-Thank you for your order with GChickenn.
+Thank you for your order with Ecommerce store.
 
 Order Details:
 ${itemLines}
@@ -50,7 +50,7 @@ ${postcode}
 We will contact you shortly regarding your order.
 
 Regards,
-GChickenn`;
+Ecommerce store`;
 }
 
 async function sendCustomerConfirmationEmail({
@@ -83,9 +83,9 @@ async function sendCustomerConfirmationEmail({
   try {
     await transporter.verify();
     await transporter.sendMail({
-      from: `GChickenn <${emailUser}>`,
+      from: `Ecommerce store <${emailUser}>`,
       to: email,
-      subject: "Your GChickenn Order Confirmation",
+      subject: "Your Ecommerce store Order Confirmation",
       text: buildOrderText({
         username,
         address1,

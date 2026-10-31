@@ -1,12 +1,18 @@
 import { render, screen } from "@testing-library/react";
 
-import App from "./App";
+import Home from "./components/Home";
 
-test("renders the GChickenn home hero", () => {
-  render(<App />);
+jest.mock(
+  "react-router-dom",
+  () => ({ Link: ({ children }) => children }),
+  { virtual: true }
+);
+
+test("renders the Ecommerce store home hero", () => {
+  render(<Home />);
   expect(
     screen.getByRole("heading", {
-      name: /delivering farm-fresh chicken with a calmer, cleaner buying experience/i
+      name: /everything you need from one clear, convenient ecommerce store/i
     })
   ).toBeInTheDocument();
 });

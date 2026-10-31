@@ -29,7 +29,6 @@ const toastProps = {
 export default function Order() {
   const [items, setItems] = useState([]);
   const [cart, setCart] = useState({});
-  const [activeImageIndex, setActiveImageIndex] = useState({});
   const [form, setForm] = useState(initialForm);
   const [loadingItems, setLoadingItems] = useState(true);
   const [itemsError, setItemsError] = useState("");
@@ -50,23 +49,6 @@ export default function Order() {
 
     fetchItems();
   }, []);
-
-  const handleImageChange = (itemId, direction, totalImages) => {
-    setActiveImageIndex((current) => {
-      const currentIndex = current[itemId] || 0;
-      let nextIndex = currentIndex + direction;
-
-      if (nextIndex < 0) {
-        nextIndex = totalImages - 1;
-      }
-
-      if (nextIndex >= totalImages) {
-        nextIndex = 0;
-      }
-
-      return { ...current, [itemId]: nextIndex };
-    });
-  };
 
   const handleWeightChange = (item, value) => {
     setCart((current) => ({
@@ -110,7 +92,6 @@ export default function Order() {
 
   const resetOrder = () => {
     setCart({});
-    setActiveImageIndex({});
     setForm(initialForm);
   };
 
@@ -179,43 +160,18 @@ export default function Order() {
             {!loadingItems && !itemsError ? (
               <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                 {items.map((item) => {
-                  const imageList = Array.isArray(item.image) ? item.image : [];
                   const itemWeight = cart[item._id]?.weight || "";
+                  const itemInitial = item.itemName?.trim().charAt(0).toUpperCase() || "P";
 
                   return (
                     <article
                       key={item._id}
                       className="overflow-hidden rounded-3xl border border-brand-line bg-white/5 shadow-panel transition duration-300 hover:-translate-y-1 hover:border-brand-gold/40 hover:bg-white/10"
                     >
-                      <div className="relative h-60 overflow-hidden bg-brand-deep/35">
-                        <img
-                          src={
-                            imageList.length
-                              ? imageList[activeImageIndex[item._id] || 0]
-                              : "https://via.placeholder.com/600x400?text=GChickenn"
-                          }
-                          alt={item.itemName}
-                          className="h-full w-full object-cover"
-                        />
-
-                        {imageList.length > 1 ? (
-                          <>
-                            <button
-                              type="button"
-                              onClick={() => handleImageChange(item._id, -1, imageList.length)}
-                              className="absolute left-3 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-brand-line bg-brand-deep/80 text-brand-cream transition hover:bg-brand-gold hover:text-brand-deep"
-                            >
-                              {"<"}
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleImageChange(item._id, 1, imageList.length)}
-                              className="absolute right-3 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-brand-line bg-brand-deep/80 text-brand-cream transition hover:bg-brand-gold hover:text-brand-deep"
-                            >
-                              {">"}
-                            </button>
-                          </>
-                        ) : null}
+                      <div className="flex h-32 items-center justify-center border-b border-brand-line bg-brand-deep/35">
+                        <span className="inline-flex h-20 w-20 items-center justify-center rounded-3xl border border-brand-gold/30 bg-brand-gold/10 font-display text-4xl text-brand-gold">
+                          {itemInitial}
+                        </span>
                       </div>
 
                       <div className="space-y-4 p-5">
@@ -229,7 +185,7 @@ export default function Order() {
                             ) : null}
                           </div>
                           <p className="min-h-[3.5rem] text-sm leading-7 text-brand-cream/75">
-                            {item.description || "Fresh farm product"}
+                            {item.description || "Quality product available to order."}
                           </p>
                           <p className="text-base font-semibold text-brand-gold">
                             {formatCurrency(item.price)} / kg
@@ -436,7 +392,7 @@ export default function Order() {
                       <span>{formatCurrency(totalAmount)}</span>
                     </div>
                     <p className="mt-3 text-sm leading-7 text-brand-cream/75">
-                      Free delivery on all orders. Vacuum sealed for freshness and handled with care.
+                      Free delivery on all orders. Every order is packed and handled with care.
                     </p>
                   </div>
                 </>

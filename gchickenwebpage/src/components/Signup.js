@@ -99,7 +99,7 @@ export default function Signup() {
       <ToastContainer {...toastProps} />
       <AuthLayout
         eyebrow="New customer"
-        title="Create your GChickenn account"
+        title="Create your Ecommerce store account"
         subtitle="Set up your customer profile once so future orders are quicker, cleaner, and easier to manage."
         accentTitle="Made for returning buyers"
         accentCopy="A saved account helps streamline future orders for homes, firms, and repeat family purchases."

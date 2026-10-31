@@ -52,10 +52,6 @@ const wholesalePriceRows = [
   }
 ];
 
-function getFirstImage(images) {
-  return Array.isArray(images) && images.length ? images[0] : "";
-}
-
 function findWholesaleMatch(wholesaleItem, productList) {
   return productList.find((product) => {
     const itemName = product.itemName?.toLowerCase() || "";
@@ -94,8 +90,6 @@ export default function Products() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [lightboxImages, setLightboxImages] = useState([]);
-  const [imageIndex, setImageIndex] = useState(0);
   const [activeSheet, setActiveSheet] = useState("retail");
 
   useEffect(() => {
@@ -114,53 +108,6 @@ export default function Products() {
     fetchProducts();
   }, []);
 
-  useEffect(() => {
-    if (!lightboxImages.length) {
-      return undefined;
-    }
-
-    const handleKeyDown = (event) => {
-      if (event.key === "Escape") {
-        setLightboxImages([]);
-        setImageIndex(0);
-      }
-
-      if (event.key === "ArrowRight" && lightboxImages.length > 1) {
-        setImageIndex((current) => (current + 1) % lightboxImages.length);
-      }
-
-      if (event.key === "ArrowLeft" && lightboxImages.length > 1) {
-        setImageIndex((current) => (current - 1 + lightboxImages.length) % lightboxImages.length);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [lightboxImages]);
-
-  const openLightbox = (images, startIndex = 0) => {
-    if (!images?.length) {
-      return;
-    }
-
-    setLightboxImages(images);
-    setImageIndex(startIndex);
-  };
-
-  const closeLightbox = () => {
-    setLightboxImages([]);
-    setImageIndex(0);
-  };
-
-  const nextImage = () => {
-    setImageIndex((current) => (current + 1) % lightboxImages.length);
-  };
-
-  const previousImage = () => {
-    setImageIndex((current) => (current - 1 + lightboxImages.length) % lightboxImages.length);
-  };
-
   const productList = useMemo(
     () => (Array.isArray(products) ? products : []),
     [products]
@@ -170,7 +117,6 @@ export default function Products() {
     () =>
       wholesalePriceRows.map((wholesaleItem) => {
         const matchedProduct = findWholesaleMatch(wholesaleItem, productList);
-        const images = Array.isArray(matchedProduct?.image) ? matchedProduct.image : [];
 
         return {
           ...wholesaleItem,
@@ -178,8 +124,7 @@ export default function Products() {
             matchedProduct?.description ||
             `Wholesale options: ${wholesaleItem.variants
               .map((variant) => variant.type)
-              .join(", ")}.`,
-          images
+              .join(", ")}.`
         };
       }),
     [productList]
@@ -201,9 +146,8 @@ export default function Products() {
     return (
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {productList.map((product, index) => {
-          const images = Array.isArray(product.image) ? product.image : [];
-          const mainImage = getFirstImage(images);
           const productKey = product._id || product.itemName;
+          const productInitial = product.itemName?.trim().charAt(0).toUpperCase() || "P";
 
           return (
             <article
@@ -211,34 +155,20 @@ export default function Products() {
               className="group overflow-hidden rounded-3xl border border-brand-line bg-white/5 shadow-panel transition duration-300 hover:-translate-y-1 hover:border-brand-gold/40 hover:bg-white/10"
               style={{ animationDelay: `${index * 60}ms` }}
             >
-              <div className="relative h-64 overflow-hidden">
-                {mainImage ? (
-                  <button
-                    type="button"
-                    onClick={() => openLightbox(images, 0)}
-                    className="h-full w-full"
-                  >
-                    <img
-                      src={mainImage}
-                      alt={product.itemName}
-                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                    />
-                  </button>
-                ) : (
-                  <div className="flex h-full items-center justify-center bg-brand-deep/30 px-6 text-center text-sm text-brand-cream/65">
-                    No image available
-                  </div>
-                )}
+              <div className="flex h-36 items-center justify-center border-b border-brand-line bg-brand-deep/30">
+                <span className="inline-flex h-20 w-20 items-center justify-center rounded-3xl border border-brand-gold/30 bg-brand-gold/10 font-display text-4xl text-brand-gold transition duration-300 group-hover:scale-105">
+                  {productInitial}
+                </span>
               </div>
 
               <div className="space-y-4 p-5">
                 <div className="space-y-2">
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-brand-sand">
-                    Premium cut
+                    Featured product
                   </p>
                   <h3 className="font-display text-2xl text-white">{product.itemName}</h3>
                   <p className="min-h-[3.5rem] text-sm leading-7 text-brand-cream/75">
-                    {product.description || "Fresh farm product"}
+                    {product.description || "Quality product available to order."}
                   </p>
                 </div>
 
@@ -247,15 +177,9 @@ export default function Products() {
                     {formatCurrency(product.price ?? product.Price ?? 0)}
                   </p>
 
-                  {images.length > 1 ? (
-                    <button
-                      type="button"
-                      className="secondary-button px-4 py-2"
-                      onClick={() => openLightbox(images, 0)}
-                    >
-                      View gallery
-                    </button>
-                  ) : null}
+                  <span className="text-xs uppercase tracking-[0.18em] text-brand-cream/55">
+                    Retail price
+                  </span>
                 </div>
               </div>
             </article>
@@ -269,7 +193,7 @@ export default function Products() {
     return (
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {wholesaleCards.map((product, index) => {
-          const mainImage = getFirstImage(product.images);
+          const productInitial = product.product.trim().charAt(0).toUpperCase();
 
           return (
             <article
@@ -277,24 +201,10 @@ export default function Products() {
               className="group overflow-hidden rounded-3xl border border-brand-line bg-white/5 shadow-panel transition duration-300 hover:-translate-y-1 hover:border-brand-gold/40 hover:bg-white/10"
               style={{ animationDelay: `${index * 60}ms` }}
             >
-              <div className="relative h-64 overflow-hidden">
-                {mainImage ? (
-                  <button
-                    type="button"
-                    onClick={() => openLightbox(product.images, 0)}
-                    className="h-full w-full"
-                  >
-                    <img
-                      src={mainImage}
-                      alt={product.product}
-                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                    />
-                  </button>
-                ) : (
-                  <div className="flex h-full items-center justify-center bg-brand-deep/30 px-6 text-center text-sm text-brand-cream/65">
-                    No image available
-                  </div>
-                )}
+              <div className="flex h-36 items-center justify-center border-b border-brand-line bg-brand-deep/30">
+                <span className="inline-flex h-20 w-20 items-center justify-center rounded-3xl border border-brand-gold/30 bg-brand-gold/10 font-display text-4xl text-brand-gold transition duration-300 group-hover:scale-105">
+                  {productInitial}
+                </span>
               </div>
 
               <div className="space-y-4 p-5">
@@ -332,15 +242,6 @@ export default function Products() {
                     Prices exclusive of GST
                   </p>
 
-                  {product.images.length > 1 ? (
-                    <button
-                      type="button"
-                      className="secondary-button px-4 py-2"
-                      onClick={() => openLightbox(product.images, 0)}
-                    >
-                      View gallery
-                    </button>
-                  ) : null}
                 </div>
               </div>
             </article>
@@ -354,9 +255,9 @@ export default function Products() {
     <div className="page-container space-y-6 pt-4 sm:space-y-8">
       <section className="section-shell text-center">
         <span className="section-eyebrow">Product sheets</span>
-        <h1 className="section-title mt-5">Fresh products with transparent pricing.</h1>
+        <h1 className="section-title mt-5">Products with transparent pricing.</h1>
         <p className="section-copy mx-auto mt-4">
-          Switch between retail and wholesale sheets with the same premium card layout, imagery, and gallery experience across desktop, tablet, and mobile.
+          Switch between retail and wholesale sheets with the same clear card layout across desktop, tablet, and mobile.
         </p>
 
         <div className="mt-8 flex justify-center">
@@ -376,8 +277,8 @@ export default function Products() {
           </div>
           <p className="max-w-xl text-sm leading-7 text-brand-cream/70">
             {activeSheet === "retail"
-              ? "Tap any product image to open a larger preview. Gallery controls appear automatically when more than one image is available."
-              : "Wholesale pricing is shown as image-based product cards with the same gallery behavior as retail. Prices are exclusive of GST and ideal for bulk buyers."}
+              ? "Review the current product descriptions and prices before starting your order."
+              : "Wholesale prices are shown by product and variant. Prices are exclusive of GST and ideal for bulk buyers."}
           </p>
         </div>
 
@@ -387,63 +288,12 @@ export default function Products() {
 
         {activeSheet === "wholesale" ? (
           <div className="mt-6 flex flex-col gap-4 rounded-3xl border border-brand-gold/25 bg-brand-gold/10 p-5 text-sm leading-7 text-brand-cream/80 lg:flex-row lg:items-center lg:justify-between">
-            <p>Prices exclusive of GST. Hygienic, vacuum-sealed packaging.</p>
+            <p>Prices exclusive of GST. Orders are packed and handled with care.</p>
             <p className="font-medium text-white">Wholesale enquiries: +91 9711028343</p>
           </div>
         ) : null}
       </section>
 
-      {lightboxImages.length ? (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 p-4 backdrop-blur-sm"
-          onClick={closeLightbox}
-        >
-          <div
-            className="relative flex max-h-[92vh] max-w-6xl items-center justify-center gap-3"
-            onClick={(event) => event.stopPropagation()}
-          >
-            {lightboxImages.length > 1 ? (
-              <button
-                type="button"
-                onClick={previousImage}
-                className="hidden h-12 w-12 items-center justify-center rounded-full border border-brand-line bg-brand-deep/85 text-xl text-brand-cream transition hover:bg-brand-gold hover:text-brand-deep sm:inline-flex"
-              >
-                {"<"}
-              </button>
-            ) : null}
-
-            <div className="relative overflow-hidden rounded-[1.7rem] border border-brand-line bg-brand-deep shadow-glow">
-              <button
-                type="button"
-                onClick={closeLightbox}
-                className="absolute right-4 top-4 z-10 inline-flex h-11 w-11 items-center justify-center rounded-full border border-brand-line bg-brand-deep/80 text-lg text-brand-cream transition hover:bg-brand-gold hover:text-brand-deep"
-              >
-                X
-              </button>
-              <img
-                src={lightboxImages[imageIndex]}
-                alt="Expanded product"
-                className="max-h-[82vh] max-w-[88vw] object-contain"
-              />
-              {lightboxImages.length > 1 ? (
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full border border-brand-line bg-brand-deep/80 px-4 py-2 text-sm text-brand-cream">
-                  {imageIndex + 1} / {lightboxImages.length}
-                </div>
-              ) : null}
-            </div>
-
-            {lightboxImages.length > 1 ? (
-              <button
-                type="button"
-                onClick={nextImage}
-                className="hidden h-12 w-12 items-center justify-center rounded-full border border-brand-line bg-brand-deep/85 text-xl text-brand-cream transition hover:bg-brand-gold hover:text-brand-deep sm:inline-flex"
-              >
-                {">"}
-              </button>
-            ) : null}
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }

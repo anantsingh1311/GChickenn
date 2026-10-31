@@ -1,55 +1,49 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const qualityPoints = [
-  "Farm-raised birds under our own supervision",
-  "Clean handling and careful preparation",
-  "Fresh delivery designed for repeat confidence"
+const shoppingBenefits = [
+  "Clear product details and transparent pricing",
+  "Simple ordering from any screen size",
+  "Reliable support from selection to delivery"
 ];
 
-const uspItems = [
+const experienceItems = [
   {
-    title: "We do not source. We raise.",
+    title: "Products made easy to explore",
     copy:
-      "Our chicken comes directly from our own farm instead of traders or wholesale markets."
+      "Browse the current catalog and compare the information you need without unnecessary distractions."
   },
   {
-    title: "A shorter path to your kitchen",
+    title: "A shorter path to checkout",
     copy:
-      "Fewer handoffs means better freshness, tighter quality control, and more predictable consistency."
+      "Choose quantities, review your total, and enter delivery details in one straightforward flow."
   },
   {
-    title: "A difference you can actually notice",
+    title: "Pricing you can understand",
     copy:
-      "Texture, appearance, and overall eating experience feel cleaner and more premium from the first order."
+      "Retail and wholesale pricing are presented clearly so you can select the option that suits your order."
   },
   {
-    title: "Built for trust, not one-time purchases",
+    title: "Built for repeat customers",
     copy:
-      "Our goal is dependable quality every single time, not occasional good batches."
+      "Account access and order tools make returning to the store quick, familiar, and dependable."
   }
 ];
 
 export default function Home() {
   return (
     <div className="page-container space-y-6 pt-4 sm:space-y-8">
-      <section className="relative overflow-hidden rounded-[2rem] border border-brand-line shadow-glow">
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage:
-              "linear-gradient(135deg, rgba(6, 47, 36, 0.92), rgba(11, 74, 55, 0.68)), url(https://gchickenimgs.s3.eu-north-1.amazonaws.com/GChickenAboutUs/PHOTO-2025-11-14-16-23-16.jpg)"
-          }}
-        />
+      <section className="relative overflow-hidden rounded-[2rem] border border-brand-line bg-brand-deep shadow-glow">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(216,180,91,0.22),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.08),transparent_30%)]" />
         <div className="relative grid gap-10 px-6 py-14 sm:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:px-12 lg:py-20">
           <div className="max-w-3xl animate-fade-up">
-            <span className="section-eyebrow">Farm to doorstep</span>
+            <span className="section-eyebrow">Shopping made simple</span>
             <h1 className="mt-6 font-display text-4xl leading-tight text-white sm:text-5xl lg:text-6xl">
-              Delivering farm-fresh chicken with a calmer, cleaner buying experience.
+              Everything you need from one clear, convenient ecommerce store.
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-8 text-brand-cream/80 sm:text-lg">
-              Premium farm-raised chicken with full control over quality,
-              hygiene, and freshness from our farm to your kitchen.
+              Discover available products, compare prices, and place an order
+              through a focused experience designed for everyday shopping.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -71,110 +65,90 @@ export default function Home() {
             </p>
 
             <div className="space-y-3">
-              {qualityPoints.map((point) => (
+              {shoppingBenefits.map((benefit) => (
                 <div
-                  key={point}
+                  key={benefit}
                   className="rounded-2xl border border-brand-line bg-white/5 px-4 py-4 text-sm leading-7 text-brand-cream/80"
                 >
-                  {point}
+                  {benefit}
                 </div>
               ))}
             </div>
 
             <div className="rounded-2xl border border-brand-gold/30 bg-brand-gold/10 px-4 py-4 text-sm leading-7 text-brand-cream/85">
-              Our goal is simple: make ordering quality chicken feel clear,
-              premium, and dependable from the first click to the final delivery.
+              Our goal is simple: make online ordering feel clear, dependable,
+              and easy from the first click to final confirmation.
             </div>
           </div>
         </div>
       </section>
 
       <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-        <div className="section-shell overflow-hidden">
-          <img
-            src="https://gchickenimgs.s3.eu-north-1.amazonaws.com/GChickenAboutUs/PHOTO-2025-02-25-11-04-47+copy.jpg"
-            alt="GChickenn farm"
-            className="h-full min-h-[320px] w-full rounded-[1.5rem] object-cover"
-          />
+        <div className="section-shell flex min-h-[320px] items-center justify-center overflow-hidden">
+          <div className="relative flex h-full min-h-[260px] w-full items-center justify-center overflow-hidden rounded-[1.5rem] border border-brand-line bg-brand-deep/50">
+            <div className="absolute h-56 w-56 rounded-full border border-brand-gold/25" />
+            <div className="absolute h-40 w-40 rotate-45 rounded-[2.5rem] border border-brand-line bg-white/5" />
+            <span className="relative font-display text-7xl text-brand-gold">ES</span>
+          </div>
         </div>
 
         <div className="section-shell">
-          <span className="section-eyebrow">About our farm</span>
-          <h2 className="section-title mt-5">Quality starts with ownership of the process.</h2>
+          <span className="section-eyebrow">About the store</span>
+          <h2 className="section-title mt-5">A practical storefront built around the customer.</h2>
           <div className="mt-5 space-y-4 text-sm leading-8 text-brand-cream/80 sm:text-base">
             <p>
-              GChickenn was built on a simple belief: if you want truly
-              high-quality chicken, you need to control every step of the journey.
+              Ecommerce store brings product discovery, account access, and
+              ordering together in one consistent experience.
             </p>
             <p>
-              While many retailers rely on traders and wholesale markets, we
-              chose a different path. We rear our own birds, oversee their
-              growth, and manage the path from farm to doorstep ourselves.
+              The catalog is connected directly to current inventory data, so
+              customers can review descriptions and prices before building an order.
             </p>
             <p>
-              That direct control helps us maintain consistency, freshness, and
-              hygiene in a way a middleman-driven system usually cannot.
+              A responsive layout keeps the same essential tools available on
+              desktop, tablet, and mobile devices.
             </p>
           </div>
 
           <div className="mt-6 rounded-3xl border border-brand-gold/25 bg-brand-gold/10 p-5 text-sm leading-7 text-brand-cream/85">
-            We are working to set a higher standard for chicken in Gurgaon: one
-            where customers know where their food comes from and feel confident
-            every time they order.
+            Shop confidently with transparent pricing, an easy order summary,
+            and support when you need it.
           </div>
         </div>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-[1.08fr_0.92fr]">
-        <div className="section-shell">
-          <span className="section-eyebrow">What sets us apart</span>
-          <h2 className="section-title mt-5">Built to feel premium before the food even arrives.</h2>
-          <p className="section-copy mt-4">
-            Every touchpoint should reflect the same standards as the product.
-            That means fresher sourcing, clearer ordering, and more confidence in what reaches your home.
-          </p>
+      <section className="section-shell">
+        <span className="section-eyebrow">What sets us apart</span>
+        <h2 className="section-title mt-5">Designed to keep every step simple.</h2>
+        <p className="section-copy mt-4">
+          Every part of the store is structured to help customers find products,
+          understand pricing, and complete orders with confidence.
+        </p>
 
-          <div className="mt-8 grid gap-4 md:grid-cols-2">
-            {uspItems.map((item, index) => (
-              <article
-                key={item.title}
-                className="rounded-3xl border border-brand-line bg-white/5 p-5 transition duration-300 hover:-translate-y-1 hover:border-brand-gold/40 hover:bg-white/10"
-                style={{ animationDelay: `${index * 80}ms` }}
-              >
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-brand-sand">
-                  0{index + 1}
-                </p>
-                <h3 className="mt-3 font-display text-2xl text-white">{item.title}</h3>
-                <p className="mt-3 text-sm leading-7 text-brand-cream/80">{item.copy}</p>
-              </article>
-            ))}
-          </div>
+        <div className="mt-8 grid gap-4 md:grid-cols-2">
+          {experienceItems.map((item, index) => (
+            <article
+              key={item.title}
+              className="rounded-3xl border border-brand-line bg-white/5 p-5 transition duration-300 hover:-translate-y-1 hover:border-brand-gold/40 hover:bg-white/10"
+              style={{ animationDelay: `${index * 80}ms` }}
+            >
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-brand-sand">
+                0{index + 1}
+              </p>
+              <h3 className="mt-3 font-display text-2xl text-white">{item.title}</h3>
+              <p className="mt-3 text-sm leading-7 text-brand-cream/80">{item.copy}</p>
+            </article>
+          ))}
         </div>
-
-        <div className="section-shell overflow-hidden">
-          <img
-            src="https://gchickenimgs.s3.eu-north-1.amazonaws.com/GChickenAboutUs/PHOTO-2025-11-14-16-22-46.jpg"
-            alt="What sets GChickenn apart"
-            className="h-full min-h-[320px] w-full rounded-[1.5rem] object-cover"
-          />
-        </div>
-      </section>
-
-      <section className="section-shell overflow-hidden p-3 sm:p-4">
-        <img
-          src="https://gchickenimgs.s3.eu-north-1.amazonaws.com/GChickenAboutUs/PHOTO-2025-11-14-16-23-16.jpg"
-          alt="GChickenn delivery promise"
-          className="max-h-[460px] w-full rounded-[1.6rem] object-cover"
-        />
       </section>
 
       <section className="section-shell grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
         <div>
           <span className="section-eyebrow">Contact</span>
-          <h2 className="section-title mt-5">Need help with business orders or a delivery question?</h2>
+          <h2 className="section-title mt-5">Need help with an order or product question?</h2>
           <p className="section-copy mt-4">
-            Reach out directly and we will help you with product questions,
-            bulk requirements, or delivery details.
+            Reach out directly and our team will help with product details,
+            bulk requirements, or delivery questions.
           </p>
         </div>
 
@@ -184,7 +158,6 @@ export default function Home() {
               Business and general queries
             </p>
             <div className="mt-4 space-y-2 text-sm leading-7 text-brand-cream/80">
-              <p>Email: sales@gchickenn.com</p>
               <p>Phone: +91 9811105130</p>
               <p>Phone: +91 9711028343</p>
             </div>

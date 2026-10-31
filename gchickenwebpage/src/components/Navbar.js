@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import axios from "axios";
 
-import brandLogo from "../brand-logo.JPG";
 import { API_URL } from "../config";
 
 const navItems = [
@@ -61,9 +60,9 @@ export default function Navbar() {
         <div className="page-container flex flex-col gap-3 py-3 text-sm text-brand-cream/70 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
             <span className="rounded-full bg-brand-gold/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-sand">
-              Farm-raised quality
+              Easy online ordering
             </span>
-            <span className="hidden sm:inline">Fresh chicken with trusted doorstep delivery.</span>
+            <span className="hidden sm:inline">Clear products, pricing, and doorstep delivery.</span>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 sm:justify-end">
@@ -107,18 +106,19 @@ export default function Navbar() {
       <div className="page-container py-4">
         <div className="surface-panel flex items-center justify-between px-4 py-4 sm:px-6">
           <Link to="/" className="flex min-w-0 items-center gap-3">
-            <img
-              src={brandLogo}
-              alt="GChickenn logo"
-              className="h-12 w-12 rounded-full border border-brand-line object-cover shadow-lg shadow-brand-deep/30"
-            />
+            <span
+              className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-brand-gold/40 bg-brand-gold/10 font-display text-xl text-brand-gold shadow-lg shadow-brand-deep/30"
+              aria-hidden="true"
+            >
+              ES
+            </span>
 
             <div className="min-w-0">
-              <p className="font-display text-3xl leading-none text-brand-gold sm:text-4xl">
-                GChickenn
+              <p className="font-display text-2xl leading-none text-brand-gold sm:text-3xl">
+                Ecommerce store
               </p>
               <p className="mt-1 text-xs uppercase tracking-[0.28em] text-brand-cream/55">
-                Premium fresh poultry
+                Shop simply
               </p>
             </div>
           </Link>
