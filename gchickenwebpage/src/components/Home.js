@@ -142,40 +142,6 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section-shell grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-        <div>
-          <span className="section-eyebrow">Contact</span>
-          <h2 className="section-title mt-5">Need help with an order or product question?</h2>
-          <p className="section-copy mt-4">
-            Reach out directly and our team will help with product details,
-            bulk requirements, or delivery questions.
-          </p>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="rounded-3xl border border-brand-line bg-white/5 p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-brand-sand">
-              Business and general queries
-            </p>
-            <div className="mt-4 space-y-2 text-sm leading-7 text-brand-cream/80">
-              <p>Phone: +91 9811105130</p>
-              <p>Phone: +91 9711028343</p>
-            </div>
-          </div>
-
-          <div className="rounded-3xl border border-brand-line bg-white/5 p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-brand-sand">
-              Visit us
-            </p>
-            <div className="mt-4 space-y-2 text-sm leading-7 text-brand-cream/80">
-              <p>TAM Foods</p>
-              <p>Shop No UGF-226</p>
-              <p>Suncity Arcade, Golf Course Road</p>
-              <p>Gurugram, Haryana 122003</p>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

@@ -289,7 +289,6 @@ export default function Products() {
         {activeSheet === "wholesale" ? (
           <div className="mt-6 flex flex-col gap-4 rounded-3xl border border-brand-gold/25 bg-brand-gold/10 p-5 text-sm leading-7 text-brand-cream/80 lg:flex-row lg:items-center lg:justify-between">
             <p>Prices exclusive of GST. Orders are packed and handled with care.</p>
-            <p className="font-medium text-white">Wholesale enquiries: +91 9711028343</p>
           </div>
         ) : null}
       </section>
