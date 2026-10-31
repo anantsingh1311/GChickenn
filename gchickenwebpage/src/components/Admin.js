@@ -93,7 +93,7 @@ export default function Admin() {
             className="rounded-2xl border border-brand-line bg-white/5 px-3 py-2"
           >
             <span className="font-medium text-white">{item.itemName}</span>
-            <span className="text-brand-cream/70"> - {item.weight} kg x {formatCurrency(item.price)}</span>
+            <span className="text-brand-cream/70"> - {item.weight} x {formatCurrency(item.price)}</span>
           </div>
         ))}
       </div>

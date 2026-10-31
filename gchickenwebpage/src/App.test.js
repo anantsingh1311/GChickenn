@@ -12,7 +12,7 @@ test("renders the Ecommerce store home hero", () => {
   render(<Home />);
   expect(
     screen.getByRole("heading", {
-      name: /everything you need from one clear, convenient ecommerce store/i
+      name: /a complete ecommerce storefront ready to adapt to your next brand/i
     })
   ).toBeInTheDocument();
 });

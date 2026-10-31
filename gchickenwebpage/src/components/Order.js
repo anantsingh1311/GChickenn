@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { API_URL } from "../config";
-import { fetchItemsFromApi } from "../utils/api";
+import sampleProducts from "../data/sampleProducts";
 import { formatCurrency } from "../utils/formatters";
 
 const initialForm = {
@@ -27,49 +27,35 @@ const toastProps = {
 };
 
 export default function Order() {
-  const [items, setItems] = useState([]);
   const [cart, setCart] = useState({});
   const [form, setForm] = useState(initialForm);
-  const [loadingItems, setLoadingItems] = useState(true);
-  const [itemsError, setItemsError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const items = sampleProducts;
 
-  useEffect(() => {
-    const fetchItems = async () => {
-      try {
-        const normalizedItems = await fetchItemsFromApi();
-        setItems(normalizedItems);
-      } catch (error) {
-        console.error("Error fetching items:", error);
-        setItemsError("Unable to load products for ordering right now.");
-      } finally {
-        setLoadingItems(false);
-      }
-    };
+  const handleQuantityChange = (item, value) => {
+    if (!/^\d*$/.test(value)) {
+      return;
+    }
 
-    fetchItems();
-  }, []);
-
-  const handleWeightChange = (item, value) => {
     setCart((current) => ({
       ...current,
       [item._id]: {
         ...item,
-        weight: value
+        quantity: value
       }
     }));
   };
 
-  const handleWeightStep = (item, delta) => {
+  const handleQuantityStep = (item, delta) => {
     setCart((current) => {
-      const currentWeight = parseFloat(current[item._id]?.weight) || 0;
-      const nextWeight = Math.max(0, Number((currentWeight + delta).toFixed(1)));
+      const currentQuantity = parseInt(current[item._id]?.quantity, 10) || 0;
+      const nextQuantity = Math.max(0, currentQuantity + delta);
 
       return {
         ...current,
         [item._id]: {
           ...item,
-          weight: nextWeight.toFixed(1)
+          quantity: nextQuantity.toString()
         }
       };
     });
@@ -81,13 +67,13 @@ export default function Order() {
   };
 
   const selectedItems = Object.values(cart).filter(
-    (item) => item.weight && parseFloat(item.weight) > 0
+    (item) => Number(item.quantity) > 0
   );
 
   const totalAmount = selectedItems.reduce((total, item) => {
-    const weight = parseFloat(item.weight) || 0;
+    const quantity = Number(item.quantity) || 0;
     const price = parseFloat(item.price) || 0;
-    return total + weight * price;
+    return total + quantity * price;
   }, 0);
 
   const resetOrder = () => {
@@ -108,7 +94,8 @@ export default function Order() {
       items: selectedItems.map((item) => ({
         itemName: item.itemName,
         price: Number(item.price),
-        weight: Number(item.weight)
+        // Keep the existing backend contract; this field stores unit quantities.
+        weight: Number(item.quantity)
       }))
     };
 
@@ -136,9 +123,9 @@ export default function Order() {
       <div className="page-container space-y-6 pt-4 sm:space-y-8">
         <section className="section-shell text-center">
           <span className="section-eyebrow">Place your order</span>
-          <h1 className="section-title mt-5">Build a fresh order with clearer steps and faster review.</h1>
+          <h1 className="section-title mt-5">Try the complete sample ordering experience.</h1>
           <p className="section-copy mx-auto mt-4">
-            Choose your products, set quantities in kilograms, and confirm delivery details from one responsive flow.
+            Choose sample products, set unit quantities, and review delivery details in one responsive flow.
           </p>
         </section>
 
@@ -149,88 +136,87 @@ export default function Order() {
               <h2 className="mt-4 font-display text-3xl text-white">Choose your products</h2>
             </div>
             <p className="max-w-xl text-sm leading-7 text-brand-cream/70">
-              Use the quantity controls to add exact weights. Your summary updates automatically as you go.
+              Use the quantity controls to add items. Your summary updates automatically as you go.
             </p>
           </div>
 
           <div className="mt-8">
-            {loadingItems ? <div className="status-card">Loading available products...</div> : null}
-            {!loadingItems && itemsError ? <div className="status-card">{itemsError}</div> : null}
+            <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+              {items.map((item) => {
+                const itemQuantity = cart[item._id]?.quantity || "";
+                const itemInitial = item.itemName?.trim().charAt(0).toUpperCase() || "P";
 
-            {!loadingItems && !itemsError ? (
-              <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-                {items.map((item) => {
-                  const itemWeight = cart[item._id]?.weight || "";
-                  const itemInitial = item.itemName?.trim().charAt(0).toUpperCase() || "P";
+                return (
+                  <article
+                    key={item._id}
+                    aria-labelledby={`product-${item._id}`}
+                    className="overflow-hidden rounded-3xl border border-brand-line bg-white/5 shadow-panel transition duration-300 hover:-translate-y-1 hover:border-brand-gold/40 hover:bg-white/10"
+                  >
+                    <div className="flex h-32 items-center justify-center border-b border-brand-line bg-brand-deep/35">
+                      <span className="inline-flex h-20 w-20 items-center justify-center rounded-3xl border border-brand-gold/30 bg-brand-gold/10 font-display text-4xl text-brand-gold">
+                        {itemInitial}
+                      </span>
+                    </div>
 
-                  return (
-                    <article
-                      key={item._id}
-                      className="overflow-hidden rounded-3xl border border-brand-line bg-white/5 shadow-panel transition duration-300 hover:-translate-y-1 hover:border-brand-gold/40 hover:bg-white/10"
-                    >
-                      <div className="flex h-32 items-center justify-center border-b border-brand-line bg-brand-deep/35">
-                        <span className="inline-flex h-20 w-20 items-center justify-center rounded-3xl border border-brand-gold/30 bg-brand-gold/10 font-display text-4xl text-brand-gold">
-                          {itemInitial}
-                        </span>
+                    <div className="space-y-4 p-5">
+                      <div className="space-y-2">
+                        <div className="flex items-start justify-between gap-3">
+                          <h3 id={`product-${item._id}`} className="font-display text-2xl text-white">{item.itemName}</h3>
+                          {parseFloat(itemQuantity) > 0 ? (
+                            <span className="rounded-full bg-brand-gold px-3 py-1 text-xs font-semibold text-brand-deep">
+                              Added
+                            </span>
+                          ) : null}
+                        </div>
+                        <p className="min-h-[3.5rem] text-sm leading-7 text-brand-cream/75">
+                          {item.description || "Quality product available to order."}
+                        </p>
+                        <p className="text-base font-semibold text-brand-gold">
+                          {formatCurrency(item.price)} / item
+                        </p>
                       </div>
 
-                      <div className="space-y-4 p-5">
-                        <div className="space-y-2">
-                          <div className="flex items-start justify-between gap-3">
-                            <h3 className="font-display text-2xl text-white">{item.itemName}</h3>
-                            {parseFloat(itemWeight) > 0 ? (
-                              <span className="rounded-full bg-brand-gold px-3 py-1 text-xs font-semibold text-brand-deep">
-                                Added
-                              </span>
-                            ) : null}
-                          </div>
-                          <p className="min-h-[3.5rem] text-sm leading-7 text-brand-cream/75">
-                            {item.description || "Quality product available to order."}
-                          </p>
-                          <p className="text-base font-semibold text-brand-gold">
-                            {formatCurrency(item.price)} / kg
-                          </p>
-                        </div>
+                      <div className="rounded-3xl border border-brand-line bg-brand-deep/30 p-4">
+                        <label className="input-label" htmlFor={`quantity-${item._id}`}>
+                          Quantity
+                        </label>
+                        <div className="mt-3 flex items-center gap-3">
+                          <button
+                            type="button"
+                            aria-label={`Decrease quantity for ${item.itemName}`}
+                            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-brand-line bg-white/5 text-xl text-brand-cream transition hover:bg-white/10"
+                            onClick={() => handleQuantityStep(item, -1)}
+                          >
+                            -
+                          </button>
 
-                        <div className="rounded-3xl border border-brand-line bg-brand-deep/30 p-4">
-                          <label className="input-label" htmlFor={`weight-${item._id}`}>
-                            Quantity in kilograms
-                          </label>
-                          <div className="mt-3 flex items-center gap-3">
-                            <button
-                              type="button"
-                              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-brand-line bg-white/5 text-xl text-brand-cream transition hover:bg-white/10"
-                              onClick={() => handleWeightStep(item, -0.5)}
-                            >
-                              -
-                            </button>
+                          <input
+                            id={`quantity-${item._id}`}
+                            type="number"
+                            min="0"
+                            step="1"
+                            aria-label={`Quantity for ${item.itemName}`}
+                            value={itemQuantity}
+                            onChange={(event) => handleQuantityChange(item, event.target.value)}
+                            className="input-field text-center"
+                            placeholder="0"
+                          />
 
-                            <input
-                              id={`weight-${item._id}`}
-                              type="number"
-                              min="0"
-                              step="0.1"
-                              value={itemWeight}
-                              onChange={(event) => handleWeightChange(item, event.target.value)}
-                              className="input-field text-center"
-                              placeholder="0.0"
-                            />
-
-                            <button
-                              type="button"
-                              className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-brand-line bg-white/5 text-xl text-brand-cream transition hover:bg-white/10"
-                              onClick={() => handleWeightStep(item, 0.5)}
-                            >
-                              +
-                            </button>
-                          </div>
+                          <button
+                            type="button"
+                            aria-label={`Increase quantity for ${item.itemName}`}
+                            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-brand-line bg-white/5 text-xl text-brand-cream transition hover:bg-white/10"
+                            onClick={() => handleQuantityStep(item, 1)}
+                          >
+                            +
+                          </button>
                         </div>
                       </div>
-                    </article>
-                  );
-                })}
-              </div>
-            ) : null}
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
           </div>
         </section>
 
@@ -362,9 +348,9 @@ export default function Order() {
               ) : (
                 <>
                   {selectedItems.map((item) => {
-                    const weight = parseFloat(item.weight) || 0;
+                    const quantity = Number(item.quantity) || 0;
                     const price = parseFloat(item.price) || 0;
-                    const itemTotal = weight * price;
+                    const itemTotal = quantity * price;
 
                     return (
                       <div
@@ -375,7 +361,7 @@ export default function Order() {
                           <div>
                             <h3 className="font-display text-xl text-white">{item.itemName}</h3>
                             <p className="mt-2 text-sm leading-7 text-brand-cream/70">
-                              {weight} kg x {formatCurrency(price)}
+                              {quantity} x {formatCurrency(price)}
                             </p>
                           </div>
                           <span className="text-sm font-semibold text-brand-gold">

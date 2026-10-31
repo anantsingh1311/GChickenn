@@ -60,9 +60,9 @@ export default function Navbar() {
         <div className="page-container flex flex-col gap-3 py-3 text-sm text-brand-cream/70 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
             <span className="rounded-full bg-brand-gold/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-brand-sand">
-              Easy online ordering
+              Portfolio demo
             </span>
-            <span className="hidden sm:inline">Clear products, pricing, and doorstep delivery.</span>
+            <span className="hidden sm:inline">Ready to customize for your next ecommerce project.</span>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 sm:justify-end">
@@ -118,7 +118,7 @@ export default function Navbar() {
                 Ecommerce store
               </p>
               <p className="mt-1 text-xs uppercase tracking-[0.28em] text-brand-cream/55">
-                Shop simply
+                Storefront demo
               </p>
             </div>
           </Link>

@@ -27,7 +27,7 @@ function buildOrderText({
   const itemLines = cleanedItems
     .map(
       (item) =>
-        `${item.itemName} - ${item.weight} kg x Rs.${item.price} = Rs.${(
+        `${item.itemName} - ${item.weight} x Rs.${item.price} = Rs.${(
           item.weight * item.price
         ).toFixed(2)}`
     )

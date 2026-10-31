@@ -1,68 +1,70 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 
-import { fetchItemsFromApi } from "../utils/api";
+import sampleProducts from "../data/sampleProducts";
 import { formatCurrency } from "../utils/formatters";
 
-const wholesalePriceRows = [
+const businessPriceRows = [
   {
-    product: "Broiler Chicken",
-    keywords: ["broiler chicken", "broiler"],
+    product: "Wireless Headphones",
+    keywords: ["wireless headphones", "headphones"],
     variants: [
-      { type: "With skin", price: 210 },
-      { type: "Without skin", price: 230 }
+      { type: "Single item", price: 3499 },
+      { type: "Pair bundle", price: 6499 }
     ]
   },
   {
-    product: "Curry Cut",
-    keywords: ["curry cut"],
-    variants: [{ type: "Small pieces", price: 245 }]
-  },
-  {
-    product: "Whole Leg (2 pcs)",
-    keywords: ["whole leg", "leg"],
+    product: "Everyday Backpack",
+    keywords: ["everyday backpack", "backpack"],
     variants: [
-      { type: "With skin", price: 165 },
-      { type: "Without skin", price: 185 }
+      { type: "Single item", price: 1899 },
+      { type: "Set of 5", price: 8499 }
     ]
   },
   {
-    product: "Drumstick / Thigh",
-    keywords: ["drumstick", "thigh"],
-    variants: [{ type: "Standard cut", price: 275 }]
+    product: "Ceramic Planter",
+    keywords: ["ceramic planter", "planter"],
+    variants: [
+      { type: "Single item", price: 799 },
+      { type: "Set of 4", price: 2799 }
+    ]
   },
   {
-    product: "Boneless Breast / Thigh",
-    keywords: ["boneless breast", "boneless thigh", "boneless"],
-    variants: [{ type: "Without skin", price: 325 }]
+    product: "Stainless Travel Bottle",
+    keywords: ["stainless travel bottle", "travel bottle"],
+    variants: [
+      { type: "Single item", price: 999 },
+      { type: "Set of 4", price: 3499 }
+    ]
   },
   {
-    product: "Breast W/O Wings",
-    keywords: ["breast w/o wings", "breast", "wings"],
-    variants: [{ type: "Without skin", price: 290 }]
+    product: "Mechanical Keyboard",
+    keywords: ["mechanical keyboard", "keyboard"],
+    variants: [
+      { type: "Single item", price: 4299 },
+      { type: "Office set of 5", price: 19999 }
+    ]
   },
   {
-    product: "Wings",
-    keywords: ["wings"],
-    variants: [{ type: "Full", price: 200 }]
-  },
-  {
-    product: "Winglet",
-    keywords: ["winglet"],
-    variants: [{ type: "Mid joint", price: 230 }]
+    product: "Cotton Throw Blanket",
+    keywords: ["cotton throw blanket", "throw blanket"],
+    variants: [
+      { type: "Single item", price: 1499 },
+      { type: "Set of 3", price: 3999 }
+    ]
   }
 ];
 
-function findWholesaleMatch(wholesaleItem, productList) {
+function findProductMatch(businessItem, productList) {
   return productList.find((product) => {
     const itemName = product.itemName?.toLowerCase() || "";
-    return wholesaleItem.keywords.some((keyword) => itemName.includes(keyword));
+    return businessItem.keywords.some((keyword) => itemName.includes(keyword));
   });
 }
 
 function renderSheetToggle(activeSheet, setActiveSheet) {
   const options = [
-    { key: "retail", label: "Retail price sheet" },
-    { key: "wholesale", label: "Wholesale price sheet" }
+    { key: "catalog", label: "Sample catalog" },
+    { key: "business", label: "Business bundles" }
   ];
 
   return (
@@ -72,6 +74,7 @@ function renderSheetToggle(activeSheet, setActiveSheet) {
           key={option.key}
           type="button"
           onClick={() => setActiveSheet(option.key)}
+          aria-pressed={activeSheet === option.key}
           className={[
             "rounded-full px-4 py-2 text-sm font-semibold transition duration-200 sm:px-5",
             activeSheet === option.key
@@ -87,62 +90,22 @@ function renderSheetToggle(activeSheet, setActiveSheet) {
 }
 
 export default function Products() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [activeSheet, setActiveSheet] = useState("retail");
+  const [activeSheet, setActiveSheet] = useState("catalog");
+  const productList = sampleProducts;
+  const businessCards = businessPriceRows.map((businessItem) => {
+    const matchedProduct = findProductMatch(businessItem, productList);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const normalizedProducts = await fetchItemsFromApi();
-        setProducts(normalizedProducts);
-      } catch (fetchError) {
-        console.error("Error fetching products:", fetchError);
-        setError("Unable to load products right now.");
-      } finally {
-        setLoading(false);
-      }
+    return {
+      ...businessItem,
+      description:
+        matchedProduct?.description ||
+        `Bundle options: ${businessItem.variants
+          .map((variant) => variant.type)
+          .join(", ")}.`
     };
+  });
 
-    fetchProducts();
-  }, []);
-
-  const productList = useMemo(
-    () => (Array.isArray(products) ? products : []),
-    [products]
-  );
-
-  const wholesaleCards = useMemo(
-    () =>
-      wholesalePriceRows.map((wholesaleItem) => {
-        const matchedProduct = findWholesaleMatch(wholesaleItem, productList);
-
-        return {
-          ...wholesaleItem,
-          description:
-            matchedProduct?.description ||
-            `Wholesale options: ${wholesaleItem.variants
-              .map((variant) => variant.type)
-              .join(", ")}.`
-        };
-      }),
-    [productList]
-  );
-
-  const renderRetailCards = () => {
-    if (loading) {
-      return <div className="status-card">Loading products...</div>;
-    }
-
-    if (error) {
-      return <div className="status-card">{error}</div>;
-    }
-
-    if (!productList.length) {
-      return <div className="status-card">No products are available right now.</div>;
-    }
-
+  const renderCatalogCards = () => {
     return (
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {productList.map((product, index) => {
@@ -178,7 +141,7 @@ export default function Products() {
                   </p>
 
                   <span className="text-xs uppercase tracking-[0.18em] text-brand-cream/55">
-                    Retail price
+                    Sample price
                   </span>
                 </div>
               </div>
@@ -189,10 +152,10 @@ export default function Products() {
     );
   };
 
-  const renderWholesaleCards = () => {
+  const renderBusinessCards = () => {
     return (
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {wholesaleCards.map((product, index) => {
+        {businessCards.map((product, index) => {
           const productInitial = product.product.trim().charAt(0).toUpperCase();
 
           return (
@@ -210,7 +173,7 @@ export default function Products() {
               <div className="space-y-4 p-5">
                 <div className="space-y-2">
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-brand-sand">
-                    Wholesale cut
+                    Business bundle
                   </p>
                   <h3 className="font-display text-2xl text-white">{product.product}</h3>
                   <p className="min-h-[3.5rem] text-sm leading-7 text-brand-cream/75">
@@ -239,9 +202,8 @@ export default function Products() {
 
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <p className="text-xs uppercase tracking-[0.2em] text-brand-cream/55">
-                    Prices exclusive of GST
+                    Demonstration pricing
                   </p>
-
                 </div>
               </div>
             </article>
@@ -254,10 +216,10 @@ export default function Products() {
   return (
     <div className="page-container space-y-6 pt-4 sm:space-y-8">
       <section className="section-shell text-center">
-        <span className="section-eyebrow">Product sheets</span>
-        <h1 className="section-title mt-5">Products with transparent pricing.</h1>
+        <span className="section-eyebrow">Demo catalog</span>
+        <h1 className="section-title mt-5">Sample products for a complete storefront preview.</h1>
         <p className="section-copy mx-auto mt-4">
-          Switch between retail and wholesale sheets with the same clear card layout across desktop, tablet, and mobile.
+          Explore a neutral demonstration catalog and business bundle view across desktop, tablet, and mobile.
         </p>
 
         <div className="mt-8 flex justify-center">
@@ -269,26 +231,26 @@ export default function Products() {
         <div className="flex flex-col gap-3 border-b border-brand-line pb-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <span className="section-eyebrow">
-              {activeSheet === "retail" ? "Retail price sheet" : "Wholesale price sheet"}
+              {activeSheet === "catalog" ? "Sample catalog" : "Business bundles"}
             </span>
             <h2 className="mt-4 font-display text-3xl text-white">
-              {activeSheet === "retail" ? "Current retail lineup" : "Wholesale product lineup"}
+              {activeSheet === "catalog" ? "Featured sample products" : "Example bundle pricing"}
             </h2>
           </div>
           <p className="max-w-xl text-sm leading-7 text-brand-cream/70">
-            {activeSheet === "retail"
-              ? "Review the current product descriptions and prices before starting your order."
-              : "Wholesale prices are shown by product and variant. Prices are exclusive of GST and ideal for bulk buyers."}
+            {activeSheet === "catalog"
+              ? "Review sample descriptions and prices, then try the ordering experience."
+              : "Business bundle pricing demonstrates how product variants and volume offers can be presented."}
           </p>
         </div>
 
         <div className="mt-8">
-          {activeSheet === "retail" ? renderRetailCards() : renderWholesaleCards()}
+          {activeSheet === "catalog" ? renderCatalogCards() : renderBusinessCards()}
         </div>
 
-        {activeSheet === "wholesale" ? (
+        {activeSheet === "business" ? (
           <div className="mt-6 flex flex-col gap-4 rounded-3xl border border-brand-gold/25 bg-brand-gold/10 p-5 text-sm leading-7 text-brand-cream/80 lg:flex-row lg:items-center lg:justify-between">
-            <p>Prices exclusive of GST. Orders are packed and handled with care.</p>
+            <p>All products and prices shown here are sample content for demonstration purposes.</p>
           </div>
         ) : null}
       </section>

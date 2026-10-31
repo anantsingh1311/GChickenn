@@ -2,9 +2,9 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 const shoppingBenefits = [
-  "Clear product details and transparent pricing",
-  "Simple ordering from any screen size",
-  "Reliable support from selection to delivery"
+  "A responsive experience across screen sizes",
+  "Reusable catalog, account, and ordering flows",
+  "A polished foundation ready for a new brand"
 ];
 
 const experienceItems = [
@@ -21,7 +21,7 @@ const experienceItems = [
   {
     title: "Pricing you can understand",
     copy:
-      "Retail and wholesale pricing are presented clearly so you can select the option that suits your order."
+      "Catalog and business pricing are presented clearly so you can select the option that suits your order."
   },
   {
     title: "Built for repeat customers",
@@ -37,13 +37,13 @@ export default function Home() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(216,180,91,0.22),transparent_34%),radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.08),transparent_30%)]" />
         <div className="relative grid gap-10 px-6 py-14 sm:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:px-12 lg:py-20">
           <div className="max-w-3xl animate-fade-up">
-            <span className="section-eyebrow">Shopping made simple</span>
+            <span className="section-eyebrow">Ecommerce portfolio demo</span>
             <h1 className="mt-6 font-display text-4xl leading-tight text-white sm:text-5xl lg:text-6xl">
-              Everything you need from one clear, convenient ecommerce store.
+              A complete ecommerce storefront ready to adapt to your next brand.
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-8 text-brand-cream/80 sm:text-lg">
-              Discover available products, compare prices, and place an order
-              through a focused experience designed for everyday shopping.
+              This portfolio project demonstrates product discovery, pricing,
+              accounts, and ordering through a focused, responsive experience.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -61,7 +61,7 @@ export default function Home() {
             style={{ animationDelay: "120ms" }}
           >
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-sand">
-              Why customers choose us
+              Ready for client projects
             </p>
 
             <div className="space-y-3">
@@ -76,8 +76,8 @@ export default function Home() {
             </div>
 
             <div className="rounded-2xl border border-brand-gold/30 bg-brand-gold/10 px-4 py-4 text-sm leading-7 text-brand-cream/85">
-              Our goal is simple: make online ordering feel clear, dependable,
-              and easy from the first click to final confirmation.
+              Built as a flexible demonstration, this storefront can be adapted
+              to a new catalog, visual identity, and customer journey.
             </div>
           </div>
         </div>
@@ -97,12 +97,12 @@ export default function Home() {
           <h2 className="section-title mt-5">A practical storefront built around the customer.</h2>
           <div className="mt-5 space-y-4 text-sm leading-8 text-brand-cream/80 sm:text-base">
             <p>
-              Ecommerce store brings product discovery, account access, and
-              ordering together in one consistent experience.
+              This ecommerce portfolio demo brings product discovery, account
+              access, and ordering together in one consistent experience.
             </p>
             <p>
-              The catalog is connected directly to current inventory data, so
-              customers can review descriptions and prices before building an order.
+              The sample catalog includes everyday products with clear descriptions
+              and example prices, ready to replace with a new business's inventory.
             </p>
             <p>
               A responsive layout keeps the same essential tools available on
@@ -111,8 +111,8 @@ export default function Home() {
           </div>
 
           <div className="mt-6 rounded-3xl border border-brand-gold/25 bg-brand-gold/10 p-5 text-sm leading-7 text-brand-cream/85">
-            Shop confidently with transparent pricing, an easy order summary,
-            and support when you need it.
+            Explore transparent pricing, responsive product cards, and a complete
+            order summary built to demonstrate a real customer journey.
           </div>
         </div>
       </section>
